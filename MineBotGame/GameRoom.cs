@@ -26,13 +26,21 @@ namespace MineBotGame
                     yield return new Vector2(i, j);
         }
 
-        private static bool GetTileFromBoolMap(bool[,] map, Vector2 pos)
+        private static bool GetTileFromBoolMap(bool[,] map, Vector2 pos, Walls walls)
         {
             int x = (int)pos.X, y = (int)pos.Y;
             if (x >= 0 && y >= 0 && x < map.GetLength(0) && y < map.GetLength(1))
                 return map[x, y];
-            else
+            else if (x < 0 && (walls & Walls.West) != Walls.None)
                 return true;
+            else if (y < 0 && (walls & Walls.North) != Walls.None)
+                return true;
+            else if (x >= map.GetLength(0) && (walls & Walls.East) != Walls.None)
+                return true;
+            else if (y >= map.GetLength(1) && (walls & Walls.South) != Walls.None)
+                return true;
+
+            return false;
         }
 
         public enum Walls
@@ -45,83 +53,136 @@ namespace MineBotGame
             All = North  | East | South | West,
         }
 
+        public class GeneratorParameters
+        {
+            public GeneratorParameters()
+            {
+                InitialChance = 550;
+                Width = 128;
+                Height = 128;
+                MaskChance = 45;
+                WallWidth = 3;
+                Walls = Walls.None;
+                PassCount = 5;
+                Smoothing = false;
+                WallForcing = true;
+            }
+
+            public int InitialChance { get; set; }
+            public int Width { get; set; }
+            public int Height { get; set; }
+            public int MaskChance { get; set; }
+            public int WallWidth { get; set; }
+            public Walls Walls { get; set; }
+            public int PassCount { get; set; }
+            public bool Smoothing { get; set; }
+            public bool WallForcing { get; set; }
+
+            public static GeneratorParameters Default
+            {
+                get
+                {
+                    return new GameRoom.GeneratorParameters()
+                    { Walls = GameRoom.Walls.None, PassCount = 6, InitialChance = 550, MaskChance = 35, Smoothing = true };
+                }
+            }
+            public static GeneratorParameters Old
+            {
+                get
+                {
+                    return new GameRoom.GeneratorParameters()
+                    { Walls = GameRoom.Walls.None, WallForcing = false, PassCount = 5, InitialChance = 550, Smoothing = false };
+                }
+            }
+        }
+
         /// <summary>
         /// Generates new room
         /// </summary>
         /// <param name="rnd">Random generator to use</param>
         /// <param name="walls">Bit mask for determining where generator must provide walls and where not.</param>
         /// <returns></returns>
-        public static GameRoom Generate(Random rnd, Walls walls = Walls.None)
+        public static GameRoom Generate(Random rnd, GeneratorParameters parameters)
         {
-            int w = 64, h = 64;
+            int initialChance = parameters.InitialChance;
+            Walls walls = parameters.Walls;
+
+            int w = parameters.Width, h = parameters.Height;
             log.Info("Generaing new Area...");
             bool[,] sp = new bool[w, h], dp = new bool[w, h];
             for (int i = 0; i < w; i++)
                 for (int j = 0; j < h; j++)
-                    sp[i, j] = rnd.Next(100) < 55;
+                    sp[i, j] = rnd.Next(1000) < initialChance;
 
             bool[,] mask = new bool[w, h];
-            int wallWidth = 3;
-            int maskPercentage = 45;
+            int wallWidth = parameters.WallWidth;
+            int maskPercentage = parameters.MaskChance;
             for (int i = 0; i < w; i++)
                 for (int j = 0; j < h; j++)
                 {
-                    if ((walls & Walls.North) == Walls.North && j < wallWidth)
+                    if ((walls & Walls.North) != Walls.None && j < wallWidth)
                     {
                         if (j == 0 || rnd.Next(100) < maskPercentage)
                             mask[i, j] = true;
                     }
-                    if ((walls & Walls.East) == Walls.East && i > w - 1 - wallWidth)
+                    if ((walls & Walls.East) != Walls.None && i > w - 1 - wallWidth)
                     {
                         if (i == w-1 || rnd.Next(100) < maskPercentage)
                             mask[i, j] = true;
                     }
-                    if ((walls & Walls.South) == Walls.South && j > h - 1 - wallWidth)
+                    if ((walls & Walls.South) != Walls.None && j > h - 1 - wallWidth)
                     {
                         if (j == h-1 || rnd.Next(100) < maskPercentage)
                             mask[i, j] = true;
                     }
-                    if ((walls & Walls.West) == Walls.West && i < wallWidth)
+                    if ((walls & Walls.West) != Walls.None && i < wallWidth)
                     {
                         if (i == 0 || rnd.Next(100) < maskPercentage)
                             mask[i, j] = true;
                     }
                 }
 
-            var inp = w / 2 - 2;
-            for (int i = 0; i < 5; i++)
+            //var inp = w / 2 - 2;
+            for (int i = 0; i < parameters.PassCount; i++)
             {
                 for (int j = 0; j < w; j++)
                     for (int k = 0; k < h; k++)
                     {
-                        if (GetNeighbourgs(new Vector2(j,k)).Select((_) => GetTileFromBoolMap(sp, _)).Where((_) => _).Count() >= 5)
+                        int nwc = GetNeighbourgs(new Vector2(j, k)).Select((_) => 
+                            GetTileFromBoolMap(sp, _, parameters.WallForcing ? walls : Walls.All)).Where((_) => _).Count();
+                        if (nwc >= 5 || (parameters.Smoothing && i == parameters.PassCount - 1 && (nwc >= 2)))
                             dp[j, k] = true;
                         else
                             dp[j, k] = false;
                     }
-                if (i != 4)
-                for (int j = 0; j < w; j++)
-                    for (int k = 0; k < h; k++)
-                        dp[j, k] |= mask[j, k];
-
-                        sp = dp;
+                if (i != parameters.PassCount - 1)
+                {
+                    for (int j = 0; j < w; j++)
+                        for (int k = 0; k < h; k++)
+                            dp[j, k] |= mask[j, k];
+                }
+                sp = dp;
                 dp = new bool[w, h];
             }
 
             var r = new GameRoom(w, h);
 
+            int wallNumber = 0;
 
             for (int i = 0; i < w; i++)
                 for (int j = 0; j < h; j++)
                 {
                     bool wall = sp[i, j];
-                    if (i == 0 || j == 0 || i == w - 1 || j == h - 1)
+                    if (wall)
                     {
-                        //wall = true;
+                        wallNumber++;
                     }
 
                     r[i, j] = new GameTile(wall);
                 }
+
+            log.DebugFormat("wallRatio: {0}", (double)wallNumber / (w * h));
+
                     /*
             int c = 12+rnd.Next(4);
             for (int i = 0; i < c; i++)

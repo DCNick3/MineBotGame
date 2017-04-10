@@ -19,7 +19,7 @@ namespace MineBotGame
         public void Init()
         {
             rnd = new Random();
-            area = GameRoom.Generate(rnd, GameRoom.Walls.All);
+            area = GameRoom.Generate(rnd, GameRoom.GeneratorParameters.Default); //TODO: Create GameArea class, that will manage rooms
 
             log.Debug("Starting bots");
             for (int i = 0; i < botCount; i++)
@@ -38,6 +38,7 @@ namespace MineBotGame
             area[bot.Position].bot = bot;
             gameBots.Add(bot);*/
 
+            onRender -= Render;
             onRender += Render;
 
             if (render > 0)
@@ -45,8 +46,8 @@ namespace MineBotGame
                 log.Debug("Render > 0, so setting console size to max");
                 Console.BufferWidth = Console.LargestWindowWidth;
                 Console.WindowWidth = Console.WindowWidth;
-                Console.BufferHeight = Console.LargestWindowHeight;
-                Console.WindowHeight = Console.BufferHeight;
+                Console.BufferHeight = Console.LargestWindowHeight + 100;
+                Console.WindowHeight = Console.BufferHeight - 100;
             }
             log.Info("Game initialized");
         }
