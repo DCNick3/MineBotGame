@@ -58,8 +58,8 @@ namespace MineBotGame
             public GeneratorParameters()
             {
                 InitialChance = 550;
-                Width = 128;
-                Height = 128;
+                Width = 64;
+                Height = 64;
                 MaskChance = 45;
                 WallWidth = 3;
                 Walls = Walls.None;
