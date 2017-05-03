@@ -68,8 +68,14 @@
       <DependentUpon>ControlForm.cs</DependentUpon>
     </Compile>
     <Compile Include="ControlLogAppender.cs" />
+    <Compile Include="Enums.cs" />
     <Compile Include="Game.cs" />
+    <Compile Include="GameObjects\BuildingOperation.cs" />
+    <Compile Include="GameObjects\Unit.cs" />
     <Compile Include="GameRoom.cs" />
+    <Compile Include="GameObjects\Building.cs" />
+    <Compile Include="GameObjects\GameObject.cs" />
+    <Compile Include="Player.cs" />
     <Compile Include="PlayerController.cs" />
     <Compile Include="GameResource.cs" />
     <Compile Include="GameTile.cs" />

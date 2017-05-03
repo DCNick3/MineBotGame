@@ -50,7 +50,7 @@ namespace MineBotGame
             Obstacle = 1,
             Ore = 2,
             Bot = 3,
-            Base = 4,
+            Building = 4,
         }
     }
 

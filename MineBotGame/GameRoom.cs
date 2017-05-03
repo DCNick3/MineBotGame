@@ -8,11 +8,11 @@ using System.Numerics;
 
 namespace MineBotGame
 {
-    public sealed class GameRoom
+    public sealed class GameArea
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger
        (System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-        private GameRoom(int width, int height)
+        private GameArea(int width, int height)
         {
             tiles = new GameTile[width, height];
             Width = width;
@@ -82,16 +82,16 @@ namespace MineBotGame
             {
                 get
                 {
-                    return new GameRoom.GeneratorParameters()
-                    { Walls = GameRoom.Walls.None, PassCount = 6, InitialChance = 550, MaskChance = 35, Smoothing = true };
+                    return new GameArea.GeneratorParameters()
+                    { Walls = GameArea.Walls.None, PassCount = 6, InitialChance = 550, MaskChance = 35, Smoothing = true };
                 }
             }
             public static GeneratorParameters Old
             {
                 get
                 {
-                    return new GameRoom.GeneratorParameters()
-                    { Walls = GameRoom.Walls.None, WallForcing = false, PassCount = 5, InitialChance = 550, Smoothing = false };
+                    return new GameArea.GeneratorParameters()
+                    { Walls = GameArea.Walls.None, WallForcing = false, PassCount = 5, InitialChance = 550, Smoothing = false };
                 }
             }
         }
@@ -102,7 +102,7 @@ namespace MineBotGame
         /// <param name="rnd">Random generator to use</param>
         /// <param name="walls">Bit mask for determining where generator must provide walls and where not.</param>
         /// <returns></returns>
-        public static GameRoom Generate(Random rnd, GeneratorParameters parameters)
+        public static GameArea Generate(Random rnd, GeneratorParameters parameters)
         {
             int initialChance = parameters.InitialChance;
             Walls walls = parameters.Walls;
@@ -165,7 +165,7 @@ namespace MineBotGame
                 dp = new bool[w, h];
             }
 
-            var r = new GameRoom(w, h);
+            var r = new GameArea(w, h);
 
             int wallNumber = 0;
 

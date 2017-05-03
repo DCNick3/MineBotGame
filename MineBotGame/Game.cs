@@ -19,7 +19,7 @@ namespace MineBotGame
         public void Init()
         {
             rnd = new Random();
-            area = GameRoom.Generate(rnd, GameRoom.GeneratorParameters.Default); //TODO: Create GameArea class, that will manage rooms
+            area = GameArea.Generate(rnd, GameArea.GeneratorParameters.Default); //TODO: Create GameArea class, that will manage rooms
 
             log.Debug("Starting bots");
             for (int i = 0; i < botCount; i++)
@@ -251,7 +251,7 @@ namespace MineBotGame
         DateTime lastRender = DateTime.Now;
         bool isGoingToRestart = false;
 
-        internal GameRoom area;
+        internal GameArea area;
         Queue<InvokeParams> invokers = new Queue<InvokeParams>();
         internal List<PlayerController> gameBots;
 
