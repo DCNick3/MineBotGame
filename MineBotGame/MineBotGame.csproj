@@ -69,12 +69,15 @@
     </Compile>
     <Compile Include="ControlLogAppender.cs" />
     <Compile Include="Enums.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="GameObjects\BuildingOperation.cs" />
     <Compile Include="GameObjects\Unit.cs" />
-    <Compile Include="GameRoom.cs" />
+    <Compile Include="GameArea.cs" />
     <Compile Include="GameObjects\Building.cs" />
     <Compile Include="GameObjects\GameObject.cs" />
+    <Compile Include="GameObjects\UnitUpgradeInfo.cs" />
+    <Compile Include="GameResourceStack.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="PlayerController.cs" />
     <Compile Include="GameResource.cs" />

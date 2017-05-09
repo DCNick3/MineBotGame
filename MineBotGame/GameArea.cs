@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Numerics;
+using MineBotGame.GameObjects;
 
 namespace MineBotGame
 {
@@ -199,6 +200,20 @@ namespace MineBotGame
 
         GameTile[,] tiles;
 
+        
+        private struct GameObjectFrame
+        {
+            public GameObjectFrame(GameObject o, GameObjectPos p)
+            {
+                obj = o;
+                lastPos = p;
+            }
+            public GameObject obj;
+            public GameObjectPos lastPos;
+        }
+
+        List<GameObjectFrame> objects = new List<GameObjectFrame>();
+
         public int Width { get; private set; }
         public int Height { get; private set; }
 
@@ -256,6 +271,68 @@ namespace MineBotGame
         {
             var f = EnumTiles().Where((_) => !this[_].IsObstacle && GetNeighbourgsNoDiagonal(_).Where((__) => this[__].IsObstacle).Count() !=0);
             return f.ElementAt(rnd.Next(f.Count()));
+        }
+
+        private bool CanPlaceObject(GameObjectPos pos)
+        {
+            return CanPlaceObject(pos.position, pos.size);
+        }
+
+        private bool CanPlaceObject(Vector2 pos, Vector2 size)
+        {
+            var p = pos.Integerize();
+            var s = size.Integerize();
+            for (int i = 0; i < s.X; i++)
+                for (int j = 0; j < s.Y; j++)
+                    if (this[p + new Vector2(i, j)].Object != null)
+                        return false;
+            return true;
+        }
+
+        private void PlaceObject(GameObject obj)
+        {
+            PlaceObject(new GameObjectPos(obj.Position, obj.Size), obj);
+        }
+
+        private void PlaceObject(GameObjectPos pos, GameObject obj)
+        {
+            var p = pos.position.Integerize();
+            var s = pos.size.Integerize();
+            for (int i = 0; i < s.X; i++)
+                for (int j = 0; j < s.Y; j++)
+                    this[p + new Vector2(i, j)].Object = obj;
+        }
+
+        private void DisplaceObject(GameObjectPos pos)
+        {
+            DisplaceObject(pos.position, pos.size);
+        }
+
+        private void DisplaceObject(Vector2 pos, Vector2 size)
+        {
+            var p = pos.Integerize();
+            var s = size.Integerize();
+            for (int i = 0; i < s.X; i++)
+                for (int j = 0; j < s.Y; j++)
+                    this[p + new Vector2(i, j)].Object = null;
+        }
+
+        /// <summary>
+        /// Updates 'Object' property of all GameTile objects.
+        /// </summary>
+        public void RebaseObjects()
+        {
+            for (int i = 0; i < objects.Count; i++)
+            {
+                var o = objects[i];
+                var p = new GameObjectPos(o.obj.Position, o.obj.Size);
+                if (p != o.lastPos)
+                {
+                    DisplaceObject(o.lastPos);
+                    PlaceObject(p, o.obj);
+                    objects[i] = new GameObjectFrame(o.obj, p);
+                }
+            }
         }
     }
 }

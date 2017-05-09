@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MineBotGame.GameObjects;
 
 namespace MineBotGame
 {
@@ -12,12 +13,12 @@ namespace MineBotGame
        (System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         public GameTile()
         {
-
+            Object = null;
         }
 
-        public GameTile(bool isObstacle) : this()
+        public GameTile(bool isWall) : this()
         {
-            IsObstacle = isObstacle;
+            IsWall = isObstacle;
         }
 
         bool isObstacle;
@@ -25,23 +26,35 @@ namespace MineBotGame
         {
             get
             {
-                return isObstacle || bot != null;
+                return isObstacle || Object != null;
+            }
+        }
+        public virtual bool IsWall
+        {
+            get
+            {
+                return isObstacle;
             }
             protected set
             {
                 isObstacle = value;
             }
         }
-        public PlayerController bot = null;
+        public GameObject Object { get; set; }
 
         public virtual new Type GetType()
         {
-            if (bot != null)
+            if (Object != null)
                 return Type.Bot;
             if (IsObstacle)
                 return Type.Obstacle;
             else
                 return Type.None;
+        }
+
+        public virtual GameResourceStack Mine(int count)
+        {
+            return new GameResourceStack(ResourceType.None, 0);
         }
 
         public enum Type
@@ -56,18 +69,26 @@ namespace MineBotGame
 
     public class GameTileOre : GameTile
     {
-        public GameTileOre(GameResource resource, int capacity) : base(true)
+        public GameTileOre(ResourceType resource, int capacity) : base(true)
         {
             Capacity = capacity;
             Resource = resource;
         }
 
-        public GameResource Resource { get; protected set; }
+        public ResourceType Resource { get; protected set; }
         public int Capacity { get; set; }
 
         public override Type GetType()
         {
             return Type.Ore;
+        }
+
+        public override GameResourceStack Mine(int count)
+        {
+            int c = Math.Max(0, Capacity = count);
+            int g = Capacity = c;
+            Capacity = c;
+            return new GameResourceStack(Resource, g);
         }
     }
 }

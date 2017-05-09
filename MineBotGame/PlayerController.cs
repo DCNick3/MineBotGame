@@ -91,7 +91,6 @@ namespace MineBotGame
 
         public Type type;
         public Vector2 vector;
-        public BotDatagram datagram; /* used by transmit */
 
         public int TickLength
         {
@@ -114,14 +113,6 @@ namespace MineBotGame
         {
             throw new NotImplementedException();
         }
-    }
-
-    public class BotDatagram
-    {
-        public byte[] Data { get; set; }
-        public int Sender { get; set; }
-        public int Receiver { get; set; }
-        public int Length { get { return Data.Length; } }
     }
 
     public class ControllerActionResult

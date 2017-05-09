@@ -9,11 +9,54 @@ namespace MineBotGame.GameObjects
 {
     public abstract class GameObject
     {
-        public abstract int HP { get; }
-        public abstract int Defence { get; }
-        public abstract int Id { get; }
+        protected GameObject(Player ownerPlayer, int id, Vector2 size)
+        {
+            this.ownerPlayer = ownerPlayer;
+            this.size = size;
+            this.id = id;
+        }
+
+        public abstract double HP { get; }
+        public abstract double Defence { get; }
+        public abstract double EnergyConsumation { get; }
+
         public abstract Vector2 Position { get; }
-        public readonly int ownerPlayer;
-        public readonly Vector2 size;
+        public int Id { get { return id; } }
+        public Player OwnerPlayer { get { return ownerPlayer; } }
+        public Vector2 Size { get { return size; } }
+        private readonly Player ownerPlayer;
+        private readonly Vector2 size;
+        private readonly int id;
+    }
+
+    public struct GameObjectPos
+    {
+        public GameObjectPos(Vector2 pos, Vector2 size)
+        {
+            position = pos;
+            this.size = size;
+        }
+        public Vector2 position;
+        public Vector2 size;
+
+        public static bool operator ==(GameObjectPos a, GameObjectPos b)
+        {
+            return a.position == b.position && a.size == b.size;
+        }
+
+        public static bool operator !=(GameObjectPos a, GameObjectPos b)
+        {
+            return a.position != b.position || a.size != b.size;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is GameObjectPos && ((GameObjectPos)obj) == this;
+        }
+
+        public override int GetHashCode()
+        {
+            return position.GetHashCode() + size.GetHashCode();
+        }
     }
 }

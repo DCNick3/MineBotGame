@@ -13,30 +13,12 @@ namespace MineBotGame
        (System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         public Game()
         {
-            gameBots = new List<PlayerController>();
         }
 
         public void Init()
         {
             rnd = new Random();
-            area = GameArea.Generate(rnd, GameArea.GeneratorParameters.Default); //TODO: Create GameArea class, that will manage rooms
-
-            log.Debug("Starting bots");
-            for (int i = 0; i < botCount; i++)
-            {
-                PlayerController bot = new LuaController();
-                bot.Id = gameBots.Count;
-                bot.Start();
-                //bot.Position = area.GetRandomFreeWithWall(rnd);
-                //area[bot.Position].bot = bot;
-                gameBots.Add(bot);
-            }
-            log.Debug("Bots started");
-            /*bot = new LuaGameBot();
-            bot.Position = area.GetRandomFree(rnd);
-            bot.Start();
-            area[bot.Position].bot = bot;
-            gameBots.Add(bot);*/
+            area = GameArea.Generate(rnd, GameArea.GeneratorParameters.Default); 
 
             onRender -= Render;
             onRender += Render;
@@ -115,31 +97,12 @@ namespace MineBotGame
         protected void StopGame()
         {
             log.Info("Stopping game");
-            int c = gameBots.Count;
-            Task[] tt = new Task[c];
-            for (int i = 0; i < c; i++)
-            {
-                var x = i;
-                tt[i] = new Task(() => gameBots[x].Stop());
-                tt[i].Start();
-            }
-            Task.WaitAll(tt);
-
-            tick = 0;
-            gameBots.Clear();
 
             log.Info("Game stopped");
         }
 
         protected void Update()
         {
-            aliveBots = 0;
-            for (int i = 0; i < gameBots.Count; i++)
-                if (gameBots[i].Alive)
-                {
-                    aliveBots++;
-                    gameBots[i].Update(this);
-                }
             tick++;
         }
 
@@ -237,10 +200,9 @@ namespace MineBotGame
 
         Random rnd;
         TimeSpan updateTime = TimeSpan.FromSeconds(1);
-        int render = 2;
-        int botCount = 0;
+        int render = 0;
         int tick = 0;
-        int tickDelay = 10;
+        int tickDelay = 0;
         int aliveBots = 0;
         DateTime lastTpsReset = DateTime.Now;
         int tpsCounter = 0;
@@ -253,7 +215,6 @@ namespace MineBotGame
 
         internal GameArea area;
         Queue<InvokeParams> invokers = new Queue<InvokeParams>();
-        internal List<PlayerController> gameBots;
 
 
         public int Tick { get { return tick; } }

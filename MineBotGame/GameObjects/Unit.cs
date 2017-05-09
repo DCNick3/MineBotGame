@@ -9,43 +9,42 @@ namespace MineBotGame.GameObjects
 {
     public class Unit : GameObject
     {
-        private Unit(Vector2 pos)
+        private Unit(Vector2 pos, Player ownerPlayer, int id) : base(ownerPlayer, id, new Vector2(1,1))
         {
             _pos = pos;
-            unitModules = new bool[Enum.GetValues(typeof(UnitModules)).Length];
+            unitModules = new bool[Enum.GetValues(typeof(UnitModule)).Length];
             unitUpgrades = new int[Enum.GetValues(typeof(UnitUpgrade)).Length];
         }
 
         bool[] unitModules;
         int[] unitUpgrades;
 
-        private int _hp, _def, _id;
+        private UnitStats stats;
+        
         private Vector2 _pos;
 
-        public override int HP
+        public override double HP
         {
             get
             {
-                return _hp;
+                return stats[UnitStatType.HP];
             }
         }
-
-        public override int Defence
+        public override double Defence
         {
             get
             {
-                return _def;
+                return stats[UnitStatType.Defence];
             }
         }
-
-        public override int Id
+        public override double EnergyConsumation
         {
             get
             {
-                return _id;
+                return stats.OverallEnergy;
             }
         }
-
+        
         public override Vector2 Position
         {
             get
@@ -54,12 +53,11 @@ namespace MineBotGame.GameObjects
             }
         }
 
-        public void SetModule(UnitModules module, bool value)
+        public void SetModule(UnitModule module, bool value)
         {
             unitModules[(int)module] = value;
         }
-
-        public bool GetModule(UnitModules module)
+        public bool GetModule(UnitModule module)
         {
             return unitModules[(int)module];
         }
@@ -68,10 +66,85 @@ namespace MineBotGame.GameObjects
         {
             unitUpgrades[(int)upgrade] = value;
         }
-
         public int GetUpgrade(UnitUpgrade upgrade)
         {
             return unitUpgrades[(int)upgrade];
+        }
+
+        /// <summary>
+        /// Updates stats, recalculating it by upgrades & modules
+        /// </summary>
+        public void UpdateValues()
+        {
+            foreach (var m in Enum.GetValues(typeof(UnitUpgrade)).Cast<UnitUpgrade>().Where((_) => _ != UnitUpgrade.None))
+            {
+                int n = GetUpgrade(m);
+                stats = stats + n * UnitUpgradeInfo.Get(m);
+            }
+        }
+    }
+
+    public class UnitStats
+    {
+        public UnitStats()
+        {
+            dat = new double[Enum.GetValues(typeof(UnitStatType)).Length];
+            this[UnitStatType.HP] = 100;
+            this[UnitStatType.EnergyK] = 1.0;
+            this[UnitStatType.EnergyUp] = 1.0;
+        }
+
+        private double[] dat;
+
+        public double this[UnitStatType index]
+        {
+            get
+            {
+                return dat[(int)index];
+            }
+            set
+            {
+                dat[(int)index] = value;
+            }
+        }
+
+        public double OverallEnergy
+        {
+            get
+            {
+                return this[UnitStatType.EnergyUp] * this[UnitStatType.EnergyK];
+            }
+        }
+
+        public UnitStats Clone()
+        {
+            return new UnitStats() { dat = (double[])dat.Clone() };
+        }
+
+        public static UnitStats operator +(UnitStats a, UnitStats b)
+        {
+            var x = new UnitStats();
+            for (int i = 0; i < b.dat.Length; i++)
+            {
+                if ((UnitStatType)i != UnitStatType.EnergyK)
+                    x.dat[i] = a.dat[i] + b.dat[i];
+                else
+                    x.dat[i] = a.dat[i] * b.dat[i];
+            }
+            return x;
+        }
+
+        public static UnitStats operator *(int a, UnitStats b)
+        {
+            var x = new UnitStats();
+            for (int i = 0; i < b.dat.Length; i++)
+            {
+                if ((UnitStatType)i != UnitStatType.EnergyK)
+                    x.dat[i] = b.dat[i] * a;
+                else
+                    x.dat[i] = Math.Pow(b.dat[i], a);
+            }
+            return x;
         }
     }
 }
