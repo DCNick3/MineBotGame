@@ -79,6 +79,7 @@
     <Compile Include="GameObjects\UnitUpgradeInfo.cs" />
     <Compile Include="GameResourceStack.cs" />
     <Compile Include="Player.cs" />
+    <Compile Include="PlayerAction.cs" />
     <Compile Include="PlayerController.cs" />
     <Compile Include="GameResource.cs" />
     <Compile Include="GameTile.cs" />

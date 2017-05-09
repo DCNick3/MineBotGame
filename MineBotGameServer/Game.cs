@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace MineBotGame
 {
+    /// <summary>
+    /// Main class, that designed to manage all connections, game objects, players etc.
+    /// </summary>
     public class Game
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger

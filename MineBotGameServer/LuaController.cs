@@ -10,6 +10,11 @@ using System.Threading;
 
 namespace MineBotGame
 {
+
+    //This looks useless now
+
+
+    /*
     public class LuaController : PlayerController
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger
@@ -123,14 +128,14 @@ end
                     botToProgramEvent.Set();
                     break;
 
-                default: /* Whoops */
+                default: /* Whoops 
                     botToProgram = new PlayerAction();
                     botToProgram.type = PlayerAction.Type.Idle;
                     botToProgramEvent.Set();
-                    /* TODO: Log it!! */
+                    /* TODO: Log it!! 
                     break;
             }
-            if (WaitHandle.WaitAny(new WaitHandle[] { programToBotEvent/*, cancelToken.WaitHandle*/}) == 1)
+            if (WaitHandle.WaitAny(new WaitHandle[] { programToBotEvent/*, cancelToken.WaitHandle}) == 1)
             {
                 log.Debug("Bot received cancel signal. Exitting.");
                 throw new OperationCanceledException();
@@ -247,7 +252,7 @@ while true do
     --print(""moving to ""..tostring(ds))
     move(d[1],d[2]);
 end
-                     */
+                     
                 }
                 catch (ScriptRuntimeException ex)
                 {
@@ -261,4 +266,5 @@ end
             }
         }
     }
+*/
 }

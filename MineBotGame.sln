@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MineBotGame", "MineBotGame\MineBotGame.csproj", "{A38B7B3B-043E-404C-BC4C-47BFCC67C212}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MineBotGameServer", "MineBotGameServer\MineBotGameServer.csproj", "{A38B7B3B-043E-404C-BC4C-47BFCC67C212}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{246C8976-3069-43F5-B56C-9A028B2A0100}"
 	ProjectSection(SolutionItems) = preProject

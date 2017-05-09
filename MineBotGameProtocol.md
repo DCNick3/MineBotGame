@@ -72,19 +72,19 @@ int         | 32х битный целочисленный знаковый чи
 
 ### Client to server commands
 
-CommandName          | Parameters        | Description
----------------------|-------------------|--------------
-Idle                 | Nothin'           | Ну собсно.... Зачем? хз.
-Move                 | Id, IVector       | Толи волю тратить, то ли замораживать..
-RangeHit             | Id, IVector       | Толи волю тратить, то ли замораживать..
-MeleeHit             | Id, IVector       | Толи волю тратить, то ли замораживать..
-BuildStart           | Id, IVector, Type | Приступаем к строительству... Юнит обездвиживается
-BuildEnd             | Id                | Бросаем строительство, теперь можно двигаться 
-StartResearch        | Id, Type          | Здание начинает исследование (помещает в очередь), ресурсы берём сразу
-StartUnitSpawn       | Id, Type          | Здание начинает создание юнита (помещает в оцередь), 
-StartUnitUpgrade     | Id, Id, Type      | Здание начинает апгрейд юнита (помещает в очередь), ресурсы берём сразу. Юнит должен быть рядом, обездвиживается (сразу, при помещении в очередь). 
-CancelBuildingAction | Id, int           | Здание отменает действие, ресурсы высвобождаются, и прочая фигня
-SelfDestruct         | Id                | Бум
+CommandName          | Parameters        | Type                   | Description
+---------------------|-------------------|------------------------|--------------
+Idle                 | Nothin'           | PlayerAction           | Ну собсно.... Зачем? хз.
+Move                 | Id, IVector       | PlayerActionVectorized | Толи волю тратить, то ли замораживать..
+RangeHit             | Id, IVector       | PlayerActionVectorized | Толи волю тратить, то ли замораживать..
+MeleeHit             | Id, IVector       | PlayerActionVectorized | Толи волю тратить, то ли замораживать..
+BuildStart           | Id, IVector, Type | PlayerActionBuild      | Приступаем к строительству... Юнит обездвиживается
+BuildEnd             | Id                | PlayerActionObject     | Бросаем строительство, теперь можно двигаться 
+StartResearch        | Id, Type          | PlayerActionOperation  | Здание начинает исследование (помещает в очередь), ресурсы берём сразу
+StartUnitSpawn       | Id, Type          | PlayerActionOperation  | Здание начинает создание юнита (помещает в оцередь), 
+StartUnitUpgrade     | Id, Id, Type      | PlayerActionUpgrade    | Здание начинает апгрейд юнита (помещает в очередь), ресурсы берём сразу. Юнит должен быть рядом, обездвиживается (сразу, при помещении в очередь). 
+CancelBuildingAction | Id, int           | PlayerActionCancel     | Здание отменает действие, ресурсы высвобождаются, и прочая фигня
+SelfDestruct         | Id                | PlayerActionObject     | Бум
 
 
 # Возможные значения переменных
