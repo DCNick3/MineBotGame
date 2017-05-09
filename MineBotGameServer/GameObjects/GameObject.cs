@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 using System.Numerics;
 
 namespace MineBotGame.GameObjects
@@ -32,6 +33,23 @@ namespace MineBotGame.GameObjects
         public Vector2 Center { get { return Position + size / 2; } }
 
         public abstract GameObject Clone();
+
+        public virtual void Serialize(Stream str)
+        {
+            BinaryWriter bw = new BinaryWriter(str);
+            if (this is Building)
+            {
+                bw.Write(0x01);
+            }
+            else if (this is Unit)
+            {
+                bw.Write(0x02);
+            }
+            else
+                throw new Exception();
+            bw.Write(Id);
+            bw.Write(OwnerPlayer.Id);
+        }
 
         public bool IsVisible(Vector2 position)
         {

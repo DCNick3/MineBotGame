@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Text;
@@ -145,6 +146,18 @@ namespace MineBotGame.GameObjects
         public override GameObject Clone()
         {
             return Clone(OwnerPlayer, Id, Position);
+        }
+
+        public override void Serialize(Stream str)
+        {
+            base.Serialize(str);
+            BinaryWriter bw = new BinaryWriter(str);
+            bw.Write((int)Type);
+            bw.WriteIVector(Position);
+            bw.WriteIVector(Size);
+            bw.Write(_hp);
+            bw.Write(_def);
+            bw.Write(_energy);
         }
     }
 }

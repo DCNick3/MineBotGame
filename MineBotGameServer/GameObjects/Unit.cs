@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Text;
@@ -94,6 +95,15 @@ namespace MineBotGame.GameObjects
         {
             return new Unit(Position, OwnerPlayer, Id) { stats = stats.Clone(), unitModules = (bool[])unitModules.Clone(), unitUpgrades = (int[])unitUpgrades.Clone() };
         }
+
+        public override void Serialize(Stream str)
+        {
+            base.Serialize(str);
+            BinaryWriter bw = new BinaryWriter(str);
+            bw.WriteIVector(Position);
+            bw.WriteBools(unitModules.Skip(1).ToArray()); /* Skip "None" module */
+            stats.Serialize(str);
+        }
     }
 
     public class UnitStats
@@ -131,6 +141,12 @@ namespace MineBotGame.GameObjects
         public UnitStats Clone()
         {
             return new UnitStats() { dat = (double[])dat.Clone() };
+        }
+
+        public void Serialize(Stream str)
+        {
+            BinaryWriter bw = new BinaryWriter(str);
+            bw.WriteDoubles(dat.Skip(1).ToArray()); /* Skip "None" Upgrade */
         }
 
         public static UnitStats operator +(UnitStats a, UnitStats b)

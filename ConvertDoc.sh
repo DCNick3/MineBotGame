@@ -1,5 +1,11 @@
 #!/bin/bash
 
+################################################################
+#                                                              #
+#   This script creates html versions of documentation files   #
+#                                                              #
+################################################################
+
 function mdtohtml {
 	echo "==> $1 -> $2"
 	rm -f $2

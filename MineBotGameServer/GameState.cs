@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 using System.Numerics;
 using MineBotGame.GameObjects;
 
@@ -16,13 +17,22 @@ namespace MineBotGame
         public int PlayerId { get; set; }
         public int[] Resources { get; set; }
         public int[] ResourceLimits { get; set; }
-        public GameObject[] GameObjects { get; set; }
         public double EnergyConsumation { get; set; }
         public double EnergyGeneration { get; set; }
+        public GameObject[] GameObjects { get; set; }
 
         public GameStateDelta Delta(GameState newGameState)
         {
-            return new GameStateDelta();
+            return new GameStateDelta()
+            {
+                PlayerId = PlayerId,
+                Resources = Resources,
+                ResourceLimits = ResourceLimits,
+                EnergyConsumation = EnergyConsumation,
+                EnergyGeneration = EnergyGeneration,
+                RemovedObjects = GameObjects.Select((_) => _.Id).Where((_) => !newGameState.GameObjects.Any((__) => __.Id == _)).ToArray(),
+                NewObjects = newGameState.GameObjects.Where((_) => !GameObjects.Any((__) => __.Id == _.Id)).ToArray(),
+            };
         }
 
         public static GameState ConstructGameState(Player player, Game game)
@@ -38,6 +48,26 @@ namespace MineBotGame
 
     public class GameStateDelta
     {
+        public int PlayerId { get; set; }
+        public int[] Resources { get; set; }
+        public int[] ResourceLimits { get; set; }
+        public double EnergyConsumation { get; set; }
+        public double EnergyGeneration { get; set; }
 
+        public int[] RemovedObjects { get; set; }
+        public GameObject[] NewObjects { get; set; }
+
+        public void Serialize(Stream str)
+        {
+            BinaryWriter bw = new BinaryWriter(str);
+            bw.Write(PlayerId);
+            bw.WriteInts(Resources);
+            bw.WriteInts(ResourceLimits);
+            bw.Write(EnergyGeneration);
+            bw.Write(EnergyConsumation);
+
+            bw.WriteInts(RemovedObjects);
+
+        }
     }
 }

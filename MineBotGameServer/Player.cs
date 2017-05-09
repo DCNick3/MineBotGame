@@ -60,7 +60,14 @@ namespace MineBotGame
         public double EnergyConsumation { get; private set; }
         public double EnergyGeneration { get; private set; }
         public List<GameObject> Objects { get { return ownedObjects; } }
-        
+
+        private int maxId = 0;
+
+        public int NewGameObjectId()
+        {
+            return ++maxId;
+        }
+
         /* Skip "None" resource */
         public int[] Resources { get { return resources.Skip(1).ToArray(); } }
         public int[] ResourceLimits { get { return resourceLimits.Skip(1).ToArray(); } }
