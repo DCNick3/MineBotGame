@@ -14,17 +14,21 @@ namespace MineBotGame
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger
        (System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-        public Game()
+        public Game(PlayerController[] players)
         {
+            this.players = new Player[players.Length];
+            for (int i = 0; i < players.Length; i++)
+            {
+                this.players[i] = new Player(this, i, players[i]);
+            }
         }
 
         public void Init()
         {
             rnd = new Random();
-            area = GameArea.Generate(rnd, GameArea.GeneratorParameters.Default); 
+            area = GameArea.Generate(rnd, GameArea.GeneratorParameters.Default);
 
             onRender -= Render;
-            onRender += Render;
 
             if (render > 0)
             {
@@ -33,60 +37,67 @@ namespace MineBotGame
                 Console.WindowWidth = Console.WindowWidth;
                 Console.BufferHeight = Console.LargestWindowHeight + 100;
                 Console.WindowHeight = Console.BufferHeight - 100;
+
+                onRender += Render;
             }
+
+            log.Debug("Starting controllers");
+
+            for (int i = 0; i < players.Length; i++)
+            {
+                players[i].Parameters = players[i].Controller.Start();
+                log.DebugFormat("Player #{0}: {1}", i, players[i].Parameters.ToString());
+            }
+
             log.Info("Game initialized");
         }
 
         public void Run()
         {
-            do
+            isStopRequested = false;
+
+            Init();
+
+            startTime = DateTime.Now;
+            while (!isStopRequested && !cancellationToken.IsCancellationRequested)
             {
-                isStopRequested = false;
-                isGoingToRestart = false;
 
-                Init();
+                DateTime st = DateTime.Now;
+                Update();
 
-                startTime = DateTime.Now;
-                while (!isStopRequested && !cancellationToken.IsCancellationRequested)
+                /*if (render > 0)
                 {
-
-                    DateTime st = DateTime.Now;
-                    Update();
-
-                    /*if (render > 0)
-                    {
-                        Render();
-                    }*/
-                    while (invokers.Count > 0)
-                    {
-                        var x = invokers.Dequeue();
-                        x.result = x.method.DynamicInvoke(x.pars);
-                        x.completeEvent.Set();
-                    }
-                    tpsCounter++;
-                    if ((DateTime.Now - lastTpsReset).TotalSeconds > 1)
-                    {
-                        lastTpsReset = DateTime.Now;
-                        Tps = tpsCounter;
-                        tpsCounter = 0;
-                    }
-                    if ((DateTime.Now - lastStatsUpdate).TotalSeconds > 0.1)
-                    {
-                        lastStatsUpdate = DateTime.Now;
-                        onStatsUpdate?.Invoke(GetStatsInternal());
-                    }
-                    if ((DateTime.Now - lastRender).TotalSeconds > 1.0 / targetFPS)
-                    {
-                        lastRender = DateTime.Now;
-                        onRender?.Invoke(this);
-                    }
-
-                    Thread.Sleep(Math.Max(tickDelay - (int)(DateTime.Now - st).TotalMilliseconds - 1, 0));
-                    updateTime = DateTime.Now - st;
+                    Render();
+                }*/
+                while (invokers.Count > 0)
+                {
+                    var x = invokers.Dequeue();
+                    x.result = x.method.DynamicInvoke(x.pars);
+                    x.completeEvent.Set();
+                }
+                tpsCounter++;
+                if ((DateTime.Now - lastTpsReset).TotalSeconds > 1)
+                {
+                    lastTpsReset = DateTime.Now;
+                    Tps = tpsCounter;
+                    tpsCounter = 0;
+                }
+                if ((DateTime.Now - lastStatsUpdate).TotalSeconds > 0.1)
+                {
+                    lastStatsUpdate = DateTime.Now;
+                    onStatsUpdate?.Invoke(GetStatsInternal());
+                }
+                if ((DateTime.Now - lastRender).TotalSeconds > 1.0 / targetFPS)
+                {
+                    lastRender = DateTime.Now;
+                    onRender?.Invoke(this);
                 }
 
-                StopGame();
-            } while (isGoingToRestart);
+                Thread.Sleep(Math.Max(tickDelay - (int)(DateTime.Now - st).TotalMilliseconds - 1, 0));
+                updateTime = DateTime.Now - st;
+            }
+
+            StopGame();
 
 
             Program.cancelSource.Cancel();
@@ -94,18 +105,32 @@ namespace MineBotGame
 
         private GameStats GetStatsInternal()
         {
-            return new GameStats(AverageTps, aliveBots, Tick, Tps);
+            return new GameStats(AverageTps, 0, Tick, Tps);
         }
 
         protected void StopGame()
         {
             log.Info("Stopping game");
 
+            for (int i = 0; i < players.Length; i++)
+                players[i].Controller.Stop();
+
+
             log.Info("Game stopped");
         }
 
         protected void Update()
         {
+            for (int i = 0; i < players.Length; i++)
+            {
+                var p = players[i];
+                p.Update(new GameState()); // TODO: this must be not null... 
+                while (p.Controller.ActionCount != 0)
+                {
+                    var a = p.Controller.PopAction();
+                    // TODO: process action
+                }
+            }
             tick++;
         }
 
@@ -114,7 +139,7 @@ namespace MineBotGame
             //Console.Clear();
             Console.SetCursorPosition(0, 0);
             StringBuilder sb = new StringBuilder();
-            sb.AppendFormat("T# {0:000000}; TPS {1:0000.00}; Bn: {2}                     \n", g.tick, 1.0 / g.updateTime.TotalSeconds, g.aliveBots);
+            sb.AppendFormat("T# {0:000000}; TPS {1:0000.00}; Bn: {2}                     \n", g.tick, 1.0 / g.updateTime.TotalSeconds, 0);
             if (g.render > 1)
             {
                 var area = g.area;
@@ -147,24 +172,6 @@ namespace MineBotGame
         public void Stop()
         {
             StopAsync().Wait();
-        }
-
-        public void Restart()
-        {
-            RestartAsync().Wait();
-        }
-
-        public Task RestartAsync()
-        {
-            log.Info("Restart was requested");
-            isGoingToRestart = true;
-            var x = Invoke(new Action(() =>
-            {
-                isStopRequested = true;
-            }));
-            var t = new Task(() => x.completeEvent.WaitOne());
-            t.Start();
-            return t;
         }
 
         public Task StopAsync()
@@ -201,20 +208,25 @@ namespace MineBotGame
         public event Action<GameStats> onStatsUpdate;
         public event Action<Game> onRender;
 
-        Random rnd;
-        TimeSpan updateTime = TimeSpan.FromSeconds(1);
+        // Configutrable parameters
+
+        // Render level (from 0 to )
         int render = 0;
+
+        // Various timing configurations
+        TimeSpan updateTime = TimeSpan.FromSeconds(1);
         int tick = 0;
         int tickDelay = 0;
-        int aliveBots = 0;
-        DateTime lastTpsReset = DateTime.Now;
         int tpsCounter = 0;
-        DateTime startTime;
-        bool isStopRequested = false;
-        DateTime lastStatsUpdate = DateTime.Now;
         double targetFPS = 20.0;
+
+        Random rnd;
+        DateTime startTime;
+        DateTime lastTpsReset = DateTime.Now;
+        DateTime lastStatsUpdate = DateTime.Now;
         DateTime lastRender = DateTime.Now;
-        bool isGoingToRestart = false;
+        bool isStopRequested = false;
+        Player[] players;
 
         internal GameArea area;
         Queue<InvokeParams> invokers = new Queue<InvokeParams>();

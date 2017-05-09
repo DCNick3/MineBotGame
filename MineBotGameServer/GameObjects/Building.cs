@@ -21,16 +21,19 @@ namespace MineBotGame.GameObjects
         }
 
         private Building(Vector2 size) : base(null, -1, size)
-        { } 
+        {
+            _scout = 10.0;
+        } 
 
         private Building(Player ownerPlayer, int id, Vector2 pos,  Vector2 size) : base(ownerPlayer, id, size)
         {
             _pos = pos;
+            _scout = 10.0;
         }
 
         public List<BuildingOperation> OperationQueue { get; private set; }
 
-        private double _hp, _def, _energy;
+        private double _hp, _def, _energy, _scout;
         private readonly Vector2 _pos;
 
 
@@ -48,6 +51,20 @@ namespace MineBotGame.GameObjects
                 return _def;
             }
         }
+        public override double EnergyConsumation
+        {
+            get
+            {
+                return _energy;
+            }
+        }
+        public override double ScoutRange
+        {
+            get
+            {
+                return _scout;
+            }
+        }
 
         public override Vector2 Position
         {
@@ -56,15 +73,9 @@ namespace MineBotGame.GameObjects
                 return _pos;
             }
         }
-        public override double EnergyConsumation
-        {
-            get
-            {
-                return _energy;
-            }
-        }
 
         public BuildingType Type { get; private set; }
+
 
         public void Enqueue(BuildingOperation operation)
         {
@@ -93,6 +104,8 @@ namespace MineBotGame.GameObjects
                 _hp = _hp,
                 _def = _def,
                 _energy = _energy,
+                _scout = _scout,
+                Type = Type,
             };
         }
 
@@ -127,6 +140,11 @@ namespace MineBotGame.GameObjects
         public static Building NewBuilding(BuildingType t, Player owner, int id, Vector2 position)
         {
             return blds[t].Clone(owner, id, position);
+        }
+
+        public override GameObject Clone()
+        {
+            return Clone(OwnerPlayer, Id, Position);
         }
     }
 }

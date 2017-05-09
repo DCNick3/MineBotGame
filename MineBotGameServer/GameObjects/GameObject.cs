@@ -24,9 +24,19 @@ namespace MineBotGame.GameObjects
         public int Id { get { return id; } }
         public Player OwnerPlayer { get { return ownerPlayer; } }
         public Vector2 Size { get { return size; } }
+        public abstract double ScoutRange { get; }
         private readonly Player ownerPlayer;
         private readonly Vector2 size;
         private readonly int id;
+
+        public Vector2 Center { get { return Position + size / 2; } }
+
+        public abstract GameObject Clone();
+
+        public bool IsVisible(Vector2 position)
+        {
+            return (Center - position).Length() <= ScoutRange;
+        }
     }
 
     public struct GameObjectPos

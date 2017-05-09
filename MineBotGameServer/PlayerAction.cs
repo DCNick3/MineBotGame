@@ -6,7 +6,7 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MineBotGame
+namespace MineBotGame.PlayerActions
 {
     /// <summary>
     /// Class, that represents Player Action
@@ -91,6 +91,11 @@ namespace MineBotGame
                 throw new InvalidDataException("Not enough data");
             }
             throw new InvalidDataException("Unknown PlayerActionType");
+        }
+
+        public override string ToString()
+        {
+            return ActionType.ToString();
         }
     }
     /*

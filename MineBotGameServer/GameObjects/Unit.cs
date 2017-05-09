@@ -44,7 +44,14 @@ namespace MineBotGame.GameObjects
                 return stats.OverallEnergy;
             }
         }
-        
+        public override double ScoutRange
+        {
+            get
+            {
+                return stats[UnitStatType.ScoutRange];
+            }
+        }
+
         public override Vector2 Position
         {
             get
@@ -81,6 +88,11 @@ namespace MineBotGame.GameObjects
                 int n = GetUpgrade(m);
                 stats = stats + n * UnitUpgradeInfo.Get(m);
             }
+        }
+
+        public override GameObject Clone()
+        {
+            return new Unit(Position, OwnerPlayer, Id) { stats = stats.Clone(), unitModules = (bool[])unitModules.Clone(), unitUpgrades = (int[])unitUpgrades.Clone() };
         }
     }
 

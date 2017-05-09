@@ -216,6 +216,7 @@ namespace MineBotGame
 
         public int Width { get; private set; }
         public int Height { get; private set; }
+        public IEnumerable<GameObject> Objects { get { return objects.Select((_) => _.obj); } }
 
         private GameTile stubTile = new GameTile(false);
 

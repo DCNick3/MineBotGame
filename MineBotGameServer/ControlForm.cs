@@ -136,11 +136,6 @@ restart
                         ConsoleWrite("Stats: \r\n" + s.ToString());
                     }
                     break;
-                case "restart":
-                    {
-                        await game.RestartAsync();
-                    }
-                    break;
                 default:
                     ConsoleWrite("Error - command not found");
                     break;

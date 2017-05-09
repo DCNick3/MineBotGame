@@ -54,8 +54,22 @@ namespace MineBotGame
 
         public int Id { get { return id; } }
 
-        public void Update()
+        public PlayerController Controller { get { return controller; } }
+        public PlayerParameters Parameters { get; set; }
+        
+        public double EnergyConsumation { get; private set; }
+        public double EnergyGeneration { get; private set; }
+        public List<GameObject> Objects { get { return ownedObjects; } }
+        
+        /* Skip "None" resource */
+        public int[] Resources { get { return resources.Skip(1).ToArray(); } }
+        public int[] ResourceLimits { get { return resourceLimits.Skip(1).ToArray(); } }
+
+        public void Update(GameState newState)
         {
+            Controller.Update(lastGameState.Delta(newState));
+            lastGameState = newState;
+
             EnergyConsumation = 0;
             EnergyGeneration = 0;
             for (int i = 0; i < resourceLimits.Length; i++)
@@ -100,11 +114,9 @@ namespace MineBotGame
         int[] resources;
         int[] resourceLimits;
 
-        public double EnergyConsumation { get; private set; }
-        public double EnergyGeneration { get; private set; }
-
         List<GameObject> ownedObjects;
         PlayerController controller;
-        Game game;
+        private Game game;
+        private GameState lastGameState = new GameState();
     }
 }

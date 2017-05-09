@@ -30,8 +30,12 @@ namespace MineBotGame
             cancelSource = new CancellationTokenSource();
             cancellationToken = cancelSource.Token;
 
+            PlayerController[] cnt = new PlayerController[2];
 
-            Game game = new Game();
+            cnt[0] = new DummyController();
+            cnt[1] = new DummyController();
+
+            Game game = new Game(cnt);
 
             controlFormThread = new Thread(ControlFormWorker);
             controlForm = new ControlForm(game);

@@ -6,6 +6,7 @@ using System.Numerics;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using MineBotGame.PlayerActions;
 
 
 namespace MineBotGame
@@ -17,16 +18,49 @@ namespace MineBotGame
         public PlayerController()
         {}
 
-        public void Start()
+        private Queue<PlayerAction> actions = new Queue<PlayerAction>();
+
+        /// <summary>
+        /// Number of actions in internal queue
+        /// </summary>
+        public int ActionCount { get { return actions.Count; } }
+
+        /// <summary>
+        /// Pops action from the beginning of internal queue 
+        /// </summary>
+        /// <returns>Popped action if there is one or null</returns>
+        public PlayerAction PopAction()
         {
+            if (actions.Count != 0)
+                return actions.Dequeue();
+            else
+                return null;
         }
 
-        public void Update(Game game)
+        /// <summary>
+        /// Pushes action to the end of internal queue
+        /// </summary>
+        /// <param name="action">Action to push</param>
+        protected void PushAction(PlayerAction action)
         {
+            actions.Enqueue(action);
         }
 
-        public void Stop()
-        {
-        }
+
+        /// <summary>
+        /// Called when <see cref="PlayerController"/> is initialized
+        /// </summary>
+        public abstract PlayerParameters Start();
+
+        /// <summary>
+        /// Called each game tick. Controller must process game state and determine what to do (push it with <see cref="PlayerController.PushAction(PlayerAction)"/>) 
+        /// </summary>
+        /// <param name="game">Game state, that is available to this player</param>
+        public abstract void Update(GameStateDelta game);
+
+        /// <summary>
+        /// Called when <see cref="PlayerController"/> is going down. It must free all used resources in this method.
+        /// </summary>
+        public abstract void Stop();
     }
 }

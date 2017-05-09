@@ -68,6 +68,7 @@
       <DependentUpon>ControlForm.cs</DependentUpon>
     </Compile>
     <Compile Include="ControlLogAppender.cs" />
+    <Compile Include="DummyController.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Game.cs" />
@@ -78,12 +79,13 @@
     <Compile Include="GameObjects\GameObject.cs" />
     <Compile Include="GameObjects\UnitUpgradeInfo.cs" />
     <Compile Include="GameResourceStack.cs" />
+    <Compile Include="GameState.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="PlayerAction.cs" />
     <Compile Include="PlayerController.cs" />
     <Compile Include="GameResource.cs" />
     <Compile Include="GameTile.cs" />
-    <Compile Include="LuaController.cs" />
+    <Compile Include="PlayerParameters.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
