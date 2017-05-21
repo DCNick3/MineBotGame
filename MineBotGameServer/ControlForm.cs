@@ -1,17 +1,10 @@
-﻿using log4net.Appender;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
+using System.Diagnostics;
+using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using log4net.Core;
-using System.Threading;
-using System.Reflection;
-using System.Diagnostics;
 
 namespace MineBotGame
 {
