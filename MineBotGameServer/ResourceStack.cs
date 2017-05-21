@@ -1,14 +1,14 @@
 ﻿namespace MineBotGame
 {
-    public struct GameResourceStack
+    public struct ResourceStack
     {
-        public GameResourceStack(ResourceType type, int count)
+        public ResourceStack(ResourceType type, int count)
         {
             Type = type;
             Count = count;
         }
 
-        public GameResourceStack(ResourceType type) : this(type, 1)
+        public ResourceStack(ResourceType type) : this(type, 1)
         { }
 
         public ResourceType Type { get; set; }

@@ -78,16 +78,19 @@
     <Compile Include="GameObjects\Building.cs" />
     <Compile Include="GameObjects\GameObject.cs" />
     <Compile Include="GameObjects\UnitUpgradeInfo.cs" />
-    <Compile Include="GameResourceStack.cs" />
+    <Compile Include="ResourceStack.cs" />
     <Compile Include="GameState.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="PlayerAction.cs" />
+    <Compile Include="PlayerActionResult.cs" />
     <Compile Include="PlayerController.cs" />
     <Compile Include="GameResource.cs" />
     <Compile Include="GameTile.cs" />
     <Compile Include="PlayerParameters.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ResourceTotality.cs" />
+    <Compile Include="TestController.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

@@ -13,12 +13,14 @@ namespace MineBotGame.PlayerActions
     /// </summary>
     public class PlayerAction
     {
-        public PlayerAction(PlayerActionType type)
+        public PlayerAction(PlayerActionType type, int actionId)
         {
             ActionType = type;
+            ActionId = actionId;
         }
 
         public PlayerActionType ActionType { get; private set; }
+        public int ActionId { get; private set; }
 
         /// <summary>
         /// Deserializes <see cref="PlayerAction"/> class from stream 
@@ -28,27 +30,28 @@ namespace MineBotGame.PlayerActions
         public static PlayerAction Deserialize(Stream str)
         {
             BinaryReader br = new BinaryReader(str);
+            int id = br.ReadInt32();
             PlayerActionType actionType = (PlayerActionType)br.ReadInt32();
             switch (actionType)
             {
                 case PlayerActionType.Idle:
-                    return new PlayerAction(actionType);
+                    return new PlayerAction(actionType, id);
                 case PlayerActionType.Move:
                 case PlayerActionType.MeleeHit:
                 case PlayerActionType.RangeHit:
-                    return new PlayerActionVectorized(actionType, br.ReadInt32(), br.ReadIVector());
+                    return new PlayerActionVectorized(actionType, id, br.ReadInt32(), br.ReadIVector());
                 case PlayerActionType.BuildStart:
-                    return new PlayerActionBuild(actionType, br.ReadInt32(), br.ReadIVector(), br.ReadInt32());
+                    return new PlayerActionBuild(actionType, id, br.ReadInt32(), br.ReadIVector(), br.ReadInt32());
                 case PlayerActionType.BuildEnd:
                 case PlayerActionType.SelfDestruct:
-                    return new PlayerActionObject(actionType, br.ReadInt32());
+                    return new PlayerActionObject(actionType, id, br.ReadInt32());
                 case PlayerActionType.StartResearch:
                 case PlayerActionType.StartUnitSpawn:
-                    return new PlayerActionOperation(actionType, br.ReadInt32(), br.ReadInt32());
+                    return new PlayerActionOperation(actionType, id, br.ReadInt32(), br.ReadInt32());
                 case PlayerActionType.StartUnitUpgrade:
-                    return new PlayerActionUpgrade(actionType, br.ReadInt32(), br.ReadInt32(), br.ReadInt32());
+                    return new PlayerActionUpgrade(actionType, id, br.ReadInt32(), br.ReadInt32(), br.ReadInt32());
                 case PlayerActionType.CancelBuildingAction:
-                    return new PlayerActionCancel(actionType, br.ReadInt32(), br.ReadInt32());
+                    return new PlayerActionCancel(actionType, id, br.ReadInt32(), br.ReadInt32());
             }
             throw new InvalidDataException("Unknown PlayerActionType");
         }
@@ -63,27 +66,28 @@ namespace MineBotGame.PlayerActions
             int i = 0;
             try
             {
+                int id = data[++i];
                 PlayerActionType actionType = (PlayerActionType)data[++i];
                 switch (actionType)
                 {
                     case PlayerActionType.Idle:
-                        return new PlayerAction(actionType);
+                        return new PlayerAction(actionType, id);
                     case PlayerActionType.Move:
                     case PlayerActionType.MeleeHit:
                     case PlayerActionType.RangeHit:
-                        return new PlayerActionVectorized(actionType, data[++i], new Vector2(data[++i], data[++i]));
+                        return new PlayerActionVectorized(actionType, id, data[++i], new Vector2(data[++i], data[++i]));
                     case PlayerActionType.BuildStart:
-                        return new PlayerActionBuild(actionType, data[++i], new Vector2(data[++i], data[++i]), data[++i]);
+                        return new PlayerActionBuild(actionType, id, data[++i], new Vector2(data[++i], data[++i]), data[++i]);
                     case PlayerActionType.BuildEnd:
                     case PlayerActionType.SelfDestruct:
-                        return new PlayerActionObject(actionType, data[++i]);
+                        return new PlayerActionObject(actionType, id, data[++i]);
                     case PlayerActionType.StartResearch:
                     case PlayerActionType.StartUnitSpawn:
-                        return new PlayerActionOperation(actionType, data[++i], data[++i]);
+                        return new PlayerActionOperation(actionType, id, data[++i], data[++i]);
                     case PlayerActionType.StartUnitUpgrade:
-                        return new PlayerActionUpgrade(actionType, data[++i], data[++i], data[++i]);
+                        return new PlayerActionUpgrade(actionType, id, data[++i], data[++i], data[++i]);
                     case PlayerActionType.CancelBuildingAction:
-                        return new PlayerActionCancel(actionType, data[++i], data[++i]);
+                        return new PlayerActionCancel(actionType, id, data[++i], data[++i]);
                 }
             }
             catch (IndexOutOfRangeException)
@@ -119,7 +123,7 @@ namespace MineBotGame.PlayerActions
     public class PlayerActionObject : PlayerAction
     {
         public int Id { get; private set; }
-        public PlayerActionObject(PlayerActionType actionType, int id) : base(actionType)
+        public PlayerActionObject(PlayerActionType actionType, int actionId, int id) : base(actionType, actionId)
         {
             Id = id;
         }
@@ -127,7 +131,7 @@ namespace MineBotGame.PlayerActions
     public class PlayerActionVectorized : PlayerActionObject
     {
         public Vector2 Vector { get; private set; }
-        public PlayerActionVectorized(PlayerActionType actionType, int id, Vector2 vector) : base(actionType, id)
+        public PlayerActionVectorized(PlayerActionType actionType, int actionId, int id, Vector2 vector) : base(actionType, actionId, id)
         {
             Vector = vector;
         }
@@ -136,7 +140,7 @@ namespace MineBotGame.PlayerActions
     public class PlayerActionBuild : PlayerActionVectorized
     {
         public int Type { get; private set; }
-        public PlayerActionBuild(PlayerActionType actionType, int id, Vector2 vector, int type) : base(actionType, id, vector)
+        public PlayerActionBuild(PlayerActionType actionType, int actionId, int id, Vector2 vector, int type) : base(actionType, actionId, id, vector)
         {
             Type = type;
         }
@@ -145,7 +149,7 @@ namespace MineBotGame.PlayerActions
     public class PlayerActionOperation : PlayerActionObject
     {
         public int Type { get; private set; }
-        public PlayerActionOperation(PlayerActionType actionType, int id, int type) : base(actionType, id)
+        public PlayerActionOperation(PlayerActionType actionType, int actionId, int id, int type) : base(actionType, actionId, id)
         {
             Type = type;
         }
@@ -155,7 +159,7 @@ namespace MineBotGame.PlayerActions
     {
         public int UnitId { get; private set; }
         public int Type { get; private set; }
-        public PlayerActionUpgrade(PlayerActionType actionType, int id, int unitId, int type) : base(actionType, id)
+        public PlayerActionUpgrade(PlayerActionType actionType, int actionId, int id, int unitId, int type) : base(actionType, actionId, id)
         {
             UnitId = unitId;
             Type = type;
@@ -165,7 +169,7 @@ namespace MineBotGame.PlayerActions
     public class PlayerActionCancel : PlayerActionObject
     {
         public int QueueIndex { get; private set; }
-        public PlayerActionCancel(PlayerActionType actionType, int id, int queueIndex) : base(actionType, id)
+        public PlayerActionCancel(PlayerActionType actionType, int actionId, int id, int queueIndex) : base(actionType, actionId, id)
         {
             QueueIndex = queueIndex;
         }

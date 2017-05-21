@@ -57,6 +57,8 @@ namespace MineBotGame
         NewUnit = 1,
         NewModule = 2,
         NewUpgrade = 3,
+        DoLocalResearch = 4,
+        DoGlobalResearch = 5,
     }
 
     public enum UnitStatType
@@ -89,5 +91,39 @@ namespace MineBotGame
         StartUnitUpgrade = 8, /* Здание начинает апгрейд юнита (помещает в очередь). Юнит должен быть рядом, обездвиживается */
         CancelBuildingAction = 9, /* Здание отменает действие */
         SelfDestruct = 10,
+    }
+
+    public enum GlobalResearch
+    {
+        None = 0,
+
+        UraniumGenerators = 1,
+        BetterModules = 2,
+        BestModules = 4,
+
+        All = UraniumGenerators | BetterModules | BestModules,
+    }
+
+    public enum LocalResearch
+    {
+        None = 0,
+
+        MoreEnergy = 1,
+        MoreStorage = 2,
+        TestResearch = 4,
+
+        All = MoreEnergy | MoreStorage | TestResearch,
+    }
+
+    public enum ActionError
+    {
+        Succeed = 0,
+        NoResources = 1,
+        NotInRange = 2,
+        ImpossibleAction = 3, //In fact this mustn't be happened if client has not bugs and player is not cheating
+        NoQueueSpace = 4,
+        GameObjectDoesNotExists = 5,
+        NoEnergy = 6,
+        InvalidQueueIndex = 7,
     }
 }

@@ -1,10 +1,8 @@
-﻿using System;
+﻿using MineBotGame.GameObjects;
+using MineBotGame.PlayerActions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using MineBotGame.GameObjects;
 
 namespace MineBotGame
 {
@@ -13,11 +11,13 @@ namespace MineBotGame
         public Player(Game game, int id, PlayerController controller)
         {
             this.id = id;
-            resources = new int[Enum.GetValues(typeof(ResourceType)).Length];
-            resourceLimits = new int[Enum.GetValues(typeof(ResourceType)).Length];
-            ownedObjects = new List<GameObject>();
+            resources = new ResourceTotality();
+            resourceLimits = new ResourceTotality();
+            ownedObjects = new Dictionary<int, GameObject>();
             this.controller = controller;
             this.game = game;
+
+            Resources.AddAll(10);
         }
 
         /// <summary>
@@ -27,7 +27,7 @@ namespace MineBotGame
         /// <returns>Value of resource</returns>
         public int GetResource(ResourceType type)
         {
-            return resources[(int)type];
+            return resources[type];
         }
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace MineBotGame
         /// <returns>Actual resource value after set</returns>
         public int SetResource(ResourceType type, int value)
         {
-            return resources[(int)type] = Math.Max(value, resourceLimits[(int)type]);
+            return resources[type] = Math.Max(value, resourceLimits[type]);
         }
 
         /// <summary>
@@ -46,10 +46,10 @@ namespace MineBotGame
         /// </summary>
         /// <param name="stack">Stack to add to player resources</param>
         /// <returns>Not used resources, that does not fit to limits</returns>
-        public GameResourceStack AddResource(GameResourceStack stack)
+        public ResourceStack AddResource(ResourceStack stack)
         {
             int c = GetResource(stack.Type);
-            return new GameResourceStack(stack.Type, stack.Count - (SetResource(stack.Type, c + stack.Count) - c));
+            return new ResourceStack(stack.Type, stack.Count - (SetResource(stack.Type, c + stack.Count) - c));
         }
 
         public int Id { get { return id; } }
@@ -57,44 +57,124 @@ namespace MineBotGame
         public PlayerController Controller { get { return controller; } }
         public PlayerParameters Parameters { get; set; }
         
-        public double EnergyConsumation { get; private set; }
-        public double EnergyGeneration { get; private set; }
-        public List<GameObject> Objects { get { return ownedObjects; } }
+        public double EnergyConsumation { get; set; }
+        public double EnergyGeneration { get; set; }
+        public Dictionary<int, GameObject> Objects { get { return ownedObjects; } }
 
-        private int maxId = 0;
+        
+        public ResourceTotality Resources { get { return resources; } }
+        public ResourceTotality ResourceLimits { get { return resourceLimits; } }
 
-        public int NewGameObjectId()
+        private ActionError ProcessAction(PlayerAction ac)
         {
-            return ++maxId;
+            switch (ac.ActionType)
+            {
+                case PlayerActionType.StartResearch:
+                    {
+                        var a = ac as PlayerActionOperation;
+                        bool isGlobal = (a.Type & 0x80000000) != 0;
+                        int type = a.Type & 0x7FFFFFFF;
+                        int msk = (isGlobal ? (int)GlobalResearch.All : (int)LocalResearch.All);
+                        if ((type & msk) != type)
+                            return ActionError.ImpossibleAction;
+                        GameObject o;
+                        if (!Objects.TryGetValue(a.Id, out o))
+                            return ActionError.GameObjectDoesNotExists;
+                        if (!(o is Building))
+                            return ActionError.ImpossibleAction;
+                        var b = o as Building;
+                        if (isGlobal)
+                        {
+                            return b.DoGlobalResearch((GlobalResearch)type);
+                        }
+                        else
+                        {
+                            return b.DoLocalResearch((LocalResearch)type);
+                        }
+                    }
+                case PlayerActionType.Idle:
+                    return ActionError.Succeed;
+                case PlayerActionType.CancelBuildingAction:
+                    {
+                        var a = ac as PlayerActionCancel;
+                        GameObject o;
+                        if (!Objects.TryGetValue(a.Id, out o))
+                            return ActionError.GameObjectDoesNotExists;
+                        if (!(o is Building))
+                            return ActionError.ImpossibleAction;
+                        var b = o as Building;
+                        return b.CancelOperation(a.QueueIndex);
+                    }
+            }
+            return ActionError.ImpossibleAction;
         }
 
-        /* Skip "None" resource */
-        public int[] Resources { get { return resources.Skip(1).ToArray(); } }
-        public int[] ResourceLimits { get { return resourceLimits.Skip(1).ToArray(); } }
+        public bool CheckResources(ResourceStack st)
+        {
+            return CheckResources(new ResourceTotality().Add(st));
+        }
 
-        public void Update(GameState newState)
+        public bool CheckResources(ResourceTotality res)
+        {
+            if (Resources >= res)
+                return true;
+            else
+                return false;
+        }
+
+        public bool CheckEnergy(int energy)
+        {
+            if (EnergyGeneration - EnergyConsumation >= energy && EnergyConsumation + energy >= 0)
+                return true;
+            else
+                return false;
+        }
+
+        public void UtilizeResources(ResourceTotality res)
+        {
+            if (!CheckResources(res))
+                throw new Exception();
+            resources = Resources - res;
+        }
+
+        public void UtilizeEnergy(int energy)
+        {
+            if (!CheckEnergy(energy))
+                throw new Exception();
+            EnergyConsumation += energy;
+        }
+
+        public void Update(GameState newState, Game game)
         {
             Controller.Update(lastGameState.Delta(newState));
             lastGameState = newState;
 
-            EnergyConsumation = 0;
-            EnergyGeneration = 0;
-            for (int i = 0; i < resourceLimits.Length; i++)
-                resourceLimits[i] = 0;
+            while (Controller.ActionCount != 0)
+            {
+                var a = Controller.PopAction();
+                var r = ProcessAction(a);
+                Controller.PushResult(new PlayerActionResult(a.ActionId, r));
+            }
+
+            //EnergyConsumation = 0;
+            //EnergyGeneration = 0;
+            /*foreach (var r in Enum.GetValues(typeof(ResourceType)).Cast<ResourceType>())
+                resourceLimits[r] = 0;*/
             for (int i = 0; i < ownedObjects.Count; i++)
             {
-                var o = ownedObjects[i];
+                var o = ownedObjects.ElementAt(i).Value;
+                o.Update();
                 if (o.HP <= 0)
                 {
                     /* TODO: Trigger event */
-                    ownedObjects.RemoveAt(i);
+                    ownedObjects.Remove(o.Id);
                     if (ownedObjects.Count != 0)
                         i--;
                     continue;
                 }
 
-                EnergyConsumation += o.EnergyConsumation;
-                if (o is Building)
+                //EnergyConsumation += o.EnergyConsumation;
+                /*if (o is Building)
                 {
                     var x = o as Building;
                     switch (x.Type)
@@ -104,11 +184,11 @@ namespace MineBotGame
                             EnergyGeneration += x.EnergyConsumation * 5;
                             break;
                         case BuildingType.Storage:
-                            for (int j = 0; j < resourceLimits.Length; j++)
-                                resourceLimits[j] += 1000; /* TODO: De-hardcode it!*/
+                            foreach (var r in Enum.GetValues(typeof(ResourceType)).Cast<ResourceType>())
+                                resourceLimits[r] += 1000; // TODO: De-hardcode it!
                             break;
                     }
-                }
+                }*/  //TODO: Make it work with decorator
                 if (o is Unit)
                 {
                     var x = o as Unit;
@@ -118,10 +198,10 @@ namespace MineBotGame
         }
 
         int id;
-        int[] resources;
-        int[] resourceLimits;
+        ResourceTotality resources;
+        ResourceTotality resourceLimits;
 
-        List<GameObject> ownedObjects;
+        Dictionary<int, GameObject> ownedObjects;
         PlayerController controller;
         private Game game;
         private GameState lastGameState = new GameState();

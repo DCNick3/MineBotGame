@@ -96,6 +96,11 @@ namespace MineBotGame.GameObjects
             return new Unit(Position, OwnerPlayer, Id) { stats = stats.Clone(), unitModules = (bool[])unitModules.Clone(), unitUpgrades = (int[])unitUpgrades.Clone() };
         }
 
+        public static Unit NewUnit(Vector2 pos, Player ownerPlayer, int id)
+        {
+            return new Unit(pos, ownerPlayer, id);
+        }
+
         public override void Serialize(Stream str)
         {
             base.Serialize(str);

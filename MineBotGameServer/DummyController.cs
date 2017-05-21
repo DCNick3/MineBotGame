@@ -10,7 +10,7 @@ namespace MineBotGame
 {
     public class DummyController : PlayerController
     {
-        public override PlayerParameters Start()
+        public override PlayerParameters Start(int playerId)
         {
             return new PlayerParameters() { Color = new Vector3(0f, 0f, 0f), Motto = "Dummy is not stupid!", Nickname = "Dummy" };
         }
@@ -19,9 +19,12 @@ namespace MineBotGame
         { 
         }
 
+        private int actionId = 0;
+
         public override void Update(GameStateDelta game)
         {
-            PushAction(new PlayerAction(PlayerActionType.Idle));
+            PopResults();
+            PushAction(new PlayerAction(PlayerActionType.Idle, ++actionId));
         }
     }
 }

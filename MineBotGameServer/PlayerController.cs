@@ -19,6 +19,7 @@ namespace MineBotGame
         {}
 
         private Queue<PlayerAction> actions = new Queue<PlayerAction>();
+        private List<PlayerActionResult> results = new List<PlayerActionResult>();
 
         /// <summary>
         /// Number of actions in internal queue
@@ -46,11 +47,22 @@ namespace MineBotGame
             actions.Enqueue(action);
         }
 
+        public void PushResult(PlayerActionResult res)
+        {
+            results.Add(res);
+        }
+
+        protected PlayerActionResult[] PopResults()
+        {
+            var r = results.ToArray();
+            results.Clear();
+            return r;
+        }
 
         /// <summary>
         /// Called when <see cref="PlayerController"/> is initialized
         /// </summary>
-        public abstract PlayerParameters Start();
+        public abstract PlayerParameters Start(int playerId);
 
         /// <summary>
         /// Called each game tick. Controller must process game state and determine what to do (push it with <see cref="PlayerController.PushAction(PlayerAction)"/>) 

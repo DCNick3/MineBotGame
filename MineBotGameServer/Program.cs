@@ -32,7 +32,7 @@ namespace MineBotGame
 
             PlayerController[] cnt = new PlayerController[2];
 
-            cnt[0] = new DummyController();
+            cnt[0] = new TestController();
             cnt[1] = new DummyController();
 
             Game game = new Game(cnt);

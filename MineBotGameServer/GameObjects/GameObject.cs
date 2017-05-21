@@ -51,6 +51,8 @@ namespace MineBotGame.GameObjects
             bw.Write(OwnerPlayer.Id);
         }
 
+        public virtual void Update() { }
+
         public bool IsVisible(Vector2 position)
         {
             return (Center - position).Length() <= ScoutRange;

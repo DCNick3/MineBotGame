@@ -52,9 +52,9 @@ namespace MineBotGame
                 return Type.None;
         }
 
-        public virtual GameResourceStack Mine(int count)
+        public virtual ResourceStack Mine(int count)
         {
-            return new GameResourceStack(ResourceType.None, 0);
+            return new ResourceStack(ResourceType.None, 0);
         }
 
         public enum Type
@@ -83,12 +83,12 @@ namespace MineBotGame
             return Type.Ore;
         }
 
-        public override GameResourceStack Mine(int count)
+        public override ResourceStack Mine(int count)
         {
             int c = Math.Max(0, Capacity = count);
             int g = Capacity = c;
             Capacity = c;
-            return new GameResourceStack(Resource, g);
+            return new ResourceStack(Resource, g);
         }
     }
 }

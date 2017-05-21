@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using MineBotGame.GameObjects;
+using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
-using System.Numerics;
-using MineBotGame.GameObjects;
 
 namespace MineBotGame
 {
@@ -19,7 +19,7 @@ namespace MineBotGame
             Width = width;
             Height = height;
         }
-        
+        #region Generator
         public IEnumerable<Vector2> EnumTiles()
         {
             for (int i = 0; i < Width; i++)
@@ -197,7 +197,7 @@ namespace MineBotGame
             log.Info("Done generating");
             return r;
         }
-
+        #endregion
         GameTile[,] tiles;
 
         
@@ -208,15 +208,20 @@ namespace MineBotGame
                 obj = o;
                 lastPos = p;
             }
+            public GameObjectFrame(GameObject o)
+            {
+                obj = o;
+                lastPos = new GameObjectPos(o.Position, o.Size);
+            }
             public GameObject obj;
             public GameObjectPos lastPos;
         }
 
-        List<GameObjectFrame> objects = new List<GameObjectFrame>();
+        Dictionary<int, GameObjectFrame> objects = new Dictionary<int, GameObjectFrame>();
 
         public int Width { get; private set; }
         public int Height { get; private set; }
-        public IEnumerable<GameObject> Objects { get { return objects.Select((_) => _.obj); } }
+        public IEnumerable<GameObject> Objects { get { return objects.Select((_) => _.Value.obj); } }
 
         private GameTile stubTile = new GameTile(false);
 
@@ -318,6 +323,12 @@ namespace MineBotGame
                     this[p + new Vector2(i, j)].Object = null;
         }
 
+        public void AddObject(GameObject obj)
+        {
+            PlaceObject(obj);
+            objects[obj.Id] = new GameObjectFrame(obj);
+        }
+
         /// <summary>
         /// Updates 'Object' property of all GameTile objects.
         /// </summary>
@@ -325,13 +336,14 @@ namespace MineBotGame
         {
             for (int i = 0; i < objects.Count; i++)
             {
-                var o = objects[i];
+                var ob = objects.ElementAt(i);
+                var o = ob.Value;
                 var p = new GameObjectPos(o.obj.Position, o.obj.Size);
                 if (p != o.lastPos)
                 {
                     DisplaceObject(o.lastPos);
                     PlaceObject(p, o.obj);
-                    objects[i] = new GameObjectFrame(o.obj, p);
+                    objects[ob.Key] = new GameObjectFrame(o.obj, p);
                 }
             }
         }

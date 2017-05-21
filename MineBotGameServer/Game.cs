@@ -1,6 +1,8 @@
-﻿using System;
+﻿using MineBotGame.GameObjects;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,8 +14,7 @@ namespace MineBotGame
     /// </summary>
     public class Game
     {
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger
-       (System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         public Game(PlayerController[] players)
         {
             this.players = new Player[players.Length];
@@ -27,6 +28,8 @@ namespace MineBotGame
         {
             rnd = new Random();
             area = GameArea.Generate(rnd, GameArea.GeneratorParameters.Default);
+
+            RegisterGameObject(Building.NewBuilding(BuildingType.Base, players[0], NewGameObjectId(), new Vector2(5f,5f)));
 
             onRender -= Render;
 
@@ -45,7 +48,7 @@ namespace MineBotGame
 
             for (int i = 0; i < players.Length; i++)
             {
-                players[i].Parameters = players[i].Controller.Start();
+                players[i].Parameters = players[i].Controller.Start(i);
                 log.DebugFormat("Player #{0}: {1}", i, players[i].Parameters.ToString());
             }
 
@@ -124,12 +127,9 @@ namespace MineBotGame
             for (int i = 0; i < players.Length; i++)
             {
                 var p = players[i];
-                p.Update(new GameState()); // TODO: this must be not null... 
-                while (p.Controller.ActionCount != 0)
-                {
-                    var a = p.Controller.PopAction();
-                    // TODO: process action
-                }
+                p.Update(GameState.ConstructGameState(p, this), this); // TODO: this must be not null... 
+
+                area.RebaseObjects();
             }
             tick++;
         }
@@ -148,10 +148,17 @@ namespace MineBotGame
                 {
                     for (int j = 0; j < area.Width; j++)
                     {
-                        if (area[j, i].IsObstacle)
-                            chrs[i, j] = 'X';
-                        else
-                            chrs[i, j] = '.';
+                        var t = area[i, j];
+                        char c = '.';
+
+                        if (t.IsObstacle)
+                            c = 'X';
+                        if (t.Object is Unit)
+                            c = '*';
+                        if (t.Object is Building)
+                            c = '#';
+
+                        chrs[i, j] = c;
                     }
                 }
                 //foreach (var b in g.gameBots)
@@ -204,14 +211,30 @@ namespace MineBotGame
             invokers.Enqueue(p);
             return p;
         }
+        
+        public int NewGameObjectId()
+        {
+            return ++maxId;
+        }
+
+        private void RegisterGameObject(GameObject obj)
+        {
+            area.AddObject(obj);
+            obj.OwnerPlayer.Objects[obj.Id] = obj;
+            if (obj is Building)
+            {
+                var b = obj as Building;
+                b.OnAdd(b.OwnerPlayer);
+            }
+        }
 
         public event Action<GameStats> onStatsUpdate;
         public event Action<Game> onRender;
 
         // Configutrable parameters
 
-        // Render level (from 0 to )
-        int render = 0;
+        // Render level (from 0 to 2)
+        int render = 2;
 
         // Various timing configurations
         TimeSpan updateTime = TimeSpan.FromSeconds(1);
@@ -227,6 +250,7 @@ namespace MineBotGame
         DateTime lastRender = DateTime.Now;
         bool isStopRequested = false;
         Player[] players;
+        int maxId = 0;
 
         internal GameArea area;
         Queue<InvokeParams> invokers = new Queue<InvokeParams>();
