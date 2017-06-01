@@ -2,6 +2,9 @@
 
 namespace MineBotGame
 {
+    /// <summary>
+    /// Class, designed for storing parameters, selected by user before game start (color, Nickname etc.)
+    /// </summary>
     public class PlayerParameters
     {
         public string Nickname { get; set; }

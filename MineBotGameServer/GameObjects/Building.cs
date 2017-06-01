@@ -6,6 +6,9 @@ using System.Numerics;
 
 namespace MineBotGame.GameObjects
 {
+    /// <summary>
+    /// Represents Building <see cref="GameObject"/>
+    /// </summary>
     public class Building : GameObject
     {
         static Building()

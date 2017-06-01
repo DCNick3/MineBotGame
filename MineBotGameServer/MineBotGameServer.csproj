@@ -84,7 +84,6 @@
     <Compile Include="PlayerAction.cs" />
     <Compile Include="PlayerActionResult.cs" />
     <Compile Include="PlayerController.cs" />
-    <Compile Include="GameResource.cs" />
     <Compile Include="GameTile.cs" />
     <Compile Include="PlayerParameters.cs" />
     <Compile Include="Program.cs" />

@@ -2,6 +2,9 @@
 
 namespace MineBotGame
 {
+    /// <summary>
+    /// Result of invoked <see cref="PlayerActions.PlayerAction"/>
+    /// </summary>
     public class PlayerActionResult
     {
         public PlayerActionResult(int actionId, ActionError error)

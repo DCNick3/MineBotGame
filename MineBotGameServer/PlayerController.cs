@@ -4,6 +4,9 @@ using System.Collections.Generic;
 
 namespace MineBotGame
 {
+    /// <summary>
+    /// Class, that encapsulates player controlling routines (by network, locally; by bot or human)
+    /// </summary>
     public abstract class PlayerController
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger

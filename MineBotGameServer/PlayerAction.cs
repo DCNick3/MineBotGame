@@ -5,7 +5,7 @@ using System.Numerics;
 namespace MineBotGame.PlayerActions
 {
     /// <summary>
-    /// Class, that represents Player Action
+    /// Class, that represents Player Action (minimal <see cref="PlayerController"/> command)
     /// </summary>
     public class PlayerAction
     {

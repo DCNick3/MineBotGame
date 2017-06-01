@@ -5,6 +5,9 @@ using System.Numerics;
 
 namespace MineBotGame
 {
+    /// <summary>
+    /// Class, that used only in debug tests... Represents locally-controlled <see cref="PlayerController"/>
+    /// </summary>
     public class TestController : PlayerController
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);

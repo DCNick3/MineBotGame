@@ -2,6 +2,9 @@
 
 namespace MineBotGame.GameObjects
 {
+    /// <summary>
+    /// Class, that represents Building operation (research, unit creation etc.)
+    /// </summary>
     public class BuildingOperation
     {
         private BuildingOperation()
@@ -10,7 +13,7 @@ namespace MineBotGame.GameObjects
             ResourceConsumation = new ResourceTotality();
         }
         
-        public int Done { get; set; }
+        public int Done { get; set; } 
         public int NeedDone { get; private set; }
         public BuildingOperationType Type { get; private set; }
         public int ParA { get; private set; }

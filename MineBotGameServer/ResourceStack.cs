@@ -1,5 +1,8 @@
 ﻿namespace MineBotGame
 {
+    /// <summary>
+    /// Class, that represents some number of one-type resource
+    /// </summary>
     public struct ResourceStack
     {
         public ResourceStack(ResourceType type, int count)

@@ -6,6 +6,9 @@ using System.Numerics;
 
 namespace MineBotGame
 {
+    /// <summary>
+    /// Class, designed for managing game area (walls, ores) and object dislocation.
+    /// </summary>
     public sealed class GameArea
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger

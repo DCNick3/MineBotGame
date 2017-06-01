@@ -4,6 +4,9 @@ using System.Numerics;
 
 namespace MineBotGame
 {
+    /// <summary>
+    /// Defines various extension methods, for better usability.
+    /// </summary>
     public static class Extensions
     {
         public static Vector2 Integerize(this Vector2 v)

@@ -6,6 +6,9 @@ using System.Linq;
 
 namespace MineBotGame
 {
+    /// <summary>
+    /// Class, designed for storing information about player (owned objects, resources etc.)
+    /// </summary>
     public class Player
     {
         public Player(Game game, int id, PlayerController controller)

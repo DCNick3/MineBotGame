@@ -2,6 +2,9 @@
 
 namespace MineBotGame.GameObjects
 {
+    /// <summary>
+    /// Stores information about affecting <see cref="UnitStats"/> by Upgrades
+    /// </summary>
     public static class UnitUpgradeInfo
     {
         static UnitUpgradeInfo()

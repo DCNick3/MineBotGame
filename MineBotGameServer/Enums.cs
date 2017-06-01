@@ -1,5 +1,7 @@
 ﻿namespace MineBotGame
 {
+    // This is defenitions of most enums, used in a game.
+
     public enum BuildingType
     {
         None = 0,

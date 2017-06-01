@@ -4,6 +4,9 @@ using System.Numerics;
 
 namespace MineBotGame.GameObjects
 {
+    /// <summary>
+    /// Represents abstract GameObject (neither a <see cref="Unit"/> or <see cref="Building"/>)
+    /// </summary>
     public abstract class GameObject
     {
         protected GameObject(Player ownerPlayer, int id, Vector2 size)

@@ -5,6 +5,9 @@ using System.Linq;
 
 namespace MineBotGame
 {
+    /// <summary>
+    /// Class, designed for storing GameState (for transmitting it to the <seealso cref="PlayerController"/>)
+    /// </summary>
     public class GameState
     {
         public GameState()

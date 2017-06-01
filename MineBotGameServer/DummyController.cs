@@ -3,6 +3,9 @@ using System.Numerics;
 
 namespace MineBotGame
 {
+    /// <summary>
+    /// Class, that represents the most simple <see cref="PlayerController"/>
+    /// </summary>
     public class DummyController : PlayerController
     {
         public override PlayerParameters Start(int playerId)

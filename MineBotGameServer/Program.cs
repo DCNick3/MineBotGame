@@ -4,7 +4,9 @@ using System.Windows.Forms;
 [assembly: log4net.Config.XmlConfigurator(Watch = true)]
 namespace MineBotGame
 {
-
+    /// <summary>
+    /// Entry class
+    /// </summary>
     public class Program
     {
         public static CancellationTokenSource cancelSource;

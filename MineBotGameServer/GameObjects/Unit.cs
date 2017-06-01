@@ -5,6 +5,9 @@ using System.Numerics;
 
 namespace MineBotGame.GameObjects
 {
+    /// <summary>
+    /// Represents Unit <see cref="GameObject"/>
+    /// </summary>
     public class Unit : GameObject
     {
         private Unit(Vector2 pos, Player ownerPlayer, int id) : base(ownerPlayer, id, new Vector2(1,1))
@@ -108,6 +111,9 @@ namespace MineBotGame.GameObjects
         }
     }
 
+    /// <summary>
+    /// Defines various <see cref="Unit"/> stats
+    /// </summary>
     public class UnitStats
     {
         public UnitStats()

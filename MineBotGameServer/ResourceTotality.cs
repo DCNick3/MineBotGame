@@ -5,6 +5,9 @@ using System.Text;
 
 namespace MineBotGame
 {
+    /// <summary>
+    /// Class, that represents various number of all-typed resources (all types in one class)
+    /// </summary>
     public class ResourceTotality
     {
         public ResourceTotality()

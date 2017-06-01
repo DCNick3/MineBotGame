@@ -4,6 +4,9 @@ using System;
 
 namespace MineBotGame
 {
+    /// <summary>
+    /// Log things, does not matter
+    /// </summary>
     public class ControlLogAppender : AppenderSkeleton
     {
         public ControlLogAppender()

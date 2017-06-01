@@ -3,6 +3,9 @@ using System;
 
 namespace MineBotGame
 {
+    /// <summary>
+    /// Class, designed for storing information about smallest part of game world - tile (may be a wall, empty space, ore etc.)
+    /// </summary>
     public class GameTile
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger
