@@ -73,6 +73,12 @@
     <Compile Include="Extensions.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="GameObjects\BuildingOperation.cs" />
+    <Compile Include="GameObjects\Buildings\Base.cs" />
+    <Compile Include="GameObjects\Buildings\Generator.cs" />
+    <Compile Include="GameObjects\Buildings\Gun.cs" />
+    <Compile Include="GameObjects\Buildings\Laboratory.cs" />
+    <Compile Include="GameObjects\Buildings\ModuleFactory.cs" />
+    <Compile Include="GameObjects\Buildings\Storage.cs" />
     <Compile Include="GameObjects\Unit.cs" />
     <Compile Include="GameArea.cs" />
     <Compile Include="GameObjects\Building.cs" />

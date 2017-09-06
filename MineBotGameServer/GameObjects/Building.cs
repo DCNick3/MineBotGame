@@ -21,14 +21,12 @@ namespace MineBotGame.GameObjects
             AddBuilding(buildingModuleFactory);
             AddBuilding(buildingStorage);
         }
-
         private Building(Vector2 size) : base(null, -1, size)
         {
             _scout = 10.0;
             OperationQueue = new List<BuildingOperation>();
         }
-
-        private Building(Player ownerPlayer, int id, Vector2 pos, Vector2 size) : base(ownerPlayer, id, size)
+        public Building(Player ownerPlayer, int id, Vector2 pos, Vector2 size) : base(ownerPlayer, id, size)
         {
             _pos = pos;
             _scout = 10.0;
@@ -47,6 +45,10 @@ namespace MineBotGame.GameObjects
             get
             {
                 return _hp;
+            }
+            protected set
+            {
+                _hp = value;
             }
         }
         public override double Defence
@@ -70,7 +72,6 @@ namespace MineBotGame.GameObjects
                 return _scout;
             }
         }
-
         public override Vector2 Position
         {
             get
@@ -78,29 +79,21 @@ namespace MineBotGame.GameObjects
                 return _pos;
             }
         }
-
-        public BuildingType Type { get; private set; }
-        public LocalResearch Researches { get; private set; }
-        private LocalResearch availableLResearches = LocalResearch.None;
-        private GlobalResearch availableGResearches = GlobalResearch.None;
-
-
+        public BuildingType Type { get; protected set; }
+        public LocalResearch Researches { get; protected set; }
+        protected LocalResearch availableLResearches = LocalResearch.None;
+        protected GlobalResearch availableGResearches = GlobalResearch.None;
         public bool Enqueue(BuildingOperation operation)
         {
             if (OperationQueue.Count == QUEUE_SIZE)
                 return false;
-
-
             OperationQueue.Add(operation);
             return true;
         }
-
-
         public BuildingOperation Dequeue()
         {
             return DequeueAt(0);
         }
-
         public BuildingOperation DequeueAt(int i)
         {
             if (OperationQueue.Count <= i)
@@ -109,7 +102,6 @@ namespace MineBotGame.GameObjects
             OperationQueue.RemoveAt(i);
             return r;
         }
-
         public Building Clone(Player ownerPlayer, int id, Vector2 pos)
         {
             var r = new Building(ownerPlayer, id, pos, Size)
@@ -129,7 +121,6 @@ namespace MineBotGame.GameObjects
             r.OperationQueue.AddRange(OperationQueue);
             return r;
         }
-
         public ActionError DoGlobalResearch(GlobalResearch type)
         {
             if ((type & availableGResearches) == 0)
@@ -138,7 +129,6 @@ namespace MineBotGame.GameObjects
             BuildingOperation op = BuildingOperation.NewGlobalResearch(type);
             return DoOperation(op);
         }
-
         public ActionError DoLocalResearch(LocalResearch type)
         {
             if ((type & availableLResearches) == 0)
@@ -147,7 +137,6 @@ namespace MineBotGame.GameObjects
             BuildingOperation op = BuildingOperation.NewLocalResearch(type);
             return DoOperation(op);
         }
-
         public ActionError DoOperation(BuildingOperation op)
         {
             if (OperationQueue.Count == QUEUE_SIZE)
@@ -163,7 +152,6 @@ namespace MineBotGame.GameObjects
             Enqueue(op);
             return ActionError.Succeed;
         }
-
         public ActionError CancelOperation(int queueIndex)
         {
             if (queueIndex >= OperationQueue.Count)
@@ -171,13 +159,11 @@ namespace MineBotGame.GameObjects
             OperationQueue.RemoveAt(queueIndex);
             return ActionError.Succeed;
         }
-
         public void OnAdd(Player p)
         {
             p.EnergyConsumation += EnergyConsumation;
             onAdd(p);
         }
-
         public override void Update()
         {
             if (OperationQueue.Count != 0)
@@ -191,15 +177,14 @@ namespace MineBotGame.GameObjects
                 }
             }
         }
-
         public void OnRemove(Player p)
         {
             p.EnergyConsumation -= EnergyConsumation;
             onRemove(p);
         }
 
-        private Action<Player> onAdd = (p) => { };
-        private Action<Player> onRemove = (p) => { };
+        protected Action<Player> onAdd = (p) => { };
+        protected Action<Player> onRemove = (p) => { };
 
         public static readonly Building buildingNone = new Building(new Vector2(0, 0))
         { _hp = 0, _def = 0, _energy = 0, Type = BuildingType.None };
