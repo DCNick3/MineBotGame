@@ -52,9 +52,9 @@
         None = 0,
         NewUnit = 1,
         NewModule = 2,
-        NewUpgrade = 3,
-        DoLocalResearch = 4,
-        DoGlobalResearch = 5,
+        NewUpgrade = 4,
+        DoLocalResearch = 8,
+        DoGlobalResearch = 16
     }
 
     public enum UnitStatType

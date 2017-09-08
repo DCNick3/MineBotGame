@@ -11,78 +11,80 @@ namespace MineBotGame.GameObjects
     /// </summary>
     public class Building : GameObject
     {
-        static Building()
+        public Building(Player ownerPlayer, int id, Vector2 pos, Vector2 size, double hp, double def, double energyCostumation,BuildingOperationType availableOperations, GlobalResearch availableGResearches, LocalResearch availableLResearches) : base(ownerPlayer, id, size)
         {
-            AddBuilding(buildingNone);
-            AddBuilding(buildingBase);
-            AddBuilding(buildingGenerator);
-            AddBuilding(buildingGun);
-            AddBuilding(buildingLaboratory);
-            AddBuilding(buildingModuleFactory);
-            AddBuilding(buildingStorage);
-        }
-        private Building(Vector2 size) : base(null, -1, size)
-        {
-            _scout = 10.0;
+            HP = hp;
+            Defence = def;
+            EnergyConsumation = energyCostumation;
+            this.pos = pos;
             OperationQueue = new List<BuildingOperation>();
+            this.availableLResearches = availableLResearches;
+            this.availableGResearches = availableGResearches;
+            this.availableOperations = availableOperations;
         }
-        public Building(Player ownerPlayer, int id, Vector2 pos, Vector2 size) : base(ownerPlayer, id, size)
-        {
-            _pos = pos;
-            _scout = 10.0;
-            OperationQueue = new List<BuildingOperation>();
-        }
-
-        public List<BuildingOperation> OperationQueue { get; private set; }
+      
         private const int QUEUE_SIZE = 5;
-
-        private double _hp, _def, _energy, _scout;
-        private readonly Vector2 _pos;
-
-
+        private double hp;
+        private double def;
+        private double energy;
+        protected readonly double scout = 10.0;
+        private readonly Vector2 pos;
+        public BuildingType Type { get; protected set; }        
+        public LocalResearch Researches { get; protected set; }
         public override double HP
         {
             get
             {
-                return _hp;
+                return hp;
             }
             protected set
             {
-                _hp = value;
+                hp = value;
             }
         }
         public override double Defence
         {
             get
             {
-                return _def;
+                return def;
+            }
+            protected set
+            {
+                def = value;
             }
         }
         public override double EnergyConsumation
         {
             get
             {
-                return _energy;
+                return energy;
+            }
+            protected set
+            {
+                energy = value;
             }
         }
         public override double ScoutRange
         {
             get
             {
-                return _scout;
+                return scout;
             }
         }
         public override Vector2 Position
         {
             get
             {
-                return _pos;
+                return pos;
             }
-        }
-        public BuildingType Type { get; protected set; }
-        public LocalResearch Researches { get; protected set; }
-        protected LocalResearch availableLResearches = LocalResearch.None;
-        protected GlobalResearch availableGResearches = GlobalResearch.None;
+        }               
+        public List<BuildingOperation> OperationQueue { get; private set; }        
+        protected Action<Player> onAdd = (p) => { };//ресурсы и энергия отнимаются в начале строительства
+        protected Action<Player> onRemove = (p) => { };
+        protected readonly LocalResearch availableLResearches = LocalResearch.None;
+        protected readonly GlobalResearch availableGResearches = GlobalResearch.None;
+        protected readonly BuildingOperationType availableOperations = BuildingOperationType.None;
+
         public bool Enqueue(BuildingOperation operation)
         {
             if (OperationQueue.Count == QUEUE_SIZE)
@@ -104,16 +106,8 @@ namespace MineBotGame.GameObjects
         }
         public Building Clone(Player ownerPlayer, int id, Vector2 pos)
         {
-            var r = new Building(ownerPlayer, id, pos, Size)
+            var r = new Building(ownerPlayer, id, pos, Size, hp, def, energy,availableOperations,availableGResearches,availableLResearches)
             {
-                _hp = _hp,
-                _def = _def,
-                _energy = _energy,
-                _scout = _scout,
-                Type = Type,
-                availableGResearches = availableGResearches,
-                availableLResearches = availableLResearches,
-                OperationQueue = new List<BuildingOperation>(),
                 Researches = Researches,
                 onAdd = onAdd,
                 onRemove = onRemove,
@@ -161,112 +155,19 @@ namespace MineBotGame.GameObjects
         }
         public void OnAdd(Player p)
         {
-            p.EnergyConsumation += EnergyConsumation;
+            //ресурсы и энергия отнимаются в начале строительства
             onAdd(p);
-        }
-        public override void Update()
-        {
-            if (OperationQueue.Count != 0)
-            {
-                var op = OperationQueue.First();
-                op.Done++;
-                if (op.Done == op.NeedDone)
-                {
-                    Dequeue();
-                    FinalizeOperation(op);
-                }
-            }
         }
         public void OnRemove(Player p)
         {
             p.EnergyConsumation -= EnergyConsumation;
             onRemove(p);
-        }
-
-        protected Action<Player> onAdd = (p) => { };
-        protected Action<Player> onRemove = (p) => { };
-
-        public static readonly Building buildingNone = new Building(new Vector2(0, 0))
-        { _hp = 0, _def = 0, _energy = 0, Type = BuildingType.None };
-
-        public static readonly Building buildingBase = new Building(new Vector2(4, 4))
-        {
-            _hp = 1000,
-            _def = 10,
-            _energy = 10,
-            Type = BuildingType.Base,
-            availableLResearches = LocalResearch.TestResearch,
-            onAdd = (p) => 
-            {
-                p.EnergyGeneration += 40.0;
-                p.ResourceLimits.AddAll(200);
-            },
-            onRemove = (p) => 
-            {
-                p.EnergyGeneration -= 40.0;
-                p.ResourceLimits.AddAll(-200);
-            },
-        };
-
-        public static readonly Building buildingStorage = new Building(new Vector2(4, 4))
-        {
-            _hp = 1000,
-            _def = 10,
-            _energy = 10,
-            Type = BuildingType.Storage,
-            availableLResearches = LocalResearch.TestResearch,
-        };
-
-        public static readonly Building buildingModuleFactory = new Building(new Vector2(4, 4))
-            { _hp = 1000, _def = 10, _energy = 10, Type = BuildingType.ModuleFactory,
-            availableLResearches = LocalResearch.TestResearch,
-        };
-
-        public static readonly Building buildingGenerator = new Building(new Vector2(4, 4))
-            { _hp = 1000, _def = 10, _energy = 10, Type = BuildingType.Generator,
-            availableLResearches = LocalResearch.TestResearch,
-        };
-
-        public static readonly Building buildingGun = new Building(new Vector2(2, 2))
-            { _hp = 1000, _def = 10, _energy = 10, Type = BuildingType.Gun,
-            availableLResearches = LocalResearch.TestResearch,
-        };
-
-        public static readonly Building buildingLaboratory = new Building(new Vector2(2, 2))
-            { _hp = 1000, _def = 10, _energy = 10, Type = BuildingType.Laboratory,
-            availableLResearches = LocalResearch.TestResearch,
-        };
-
-        private static Dictionary<BuildingType, Building> blds = new Dictionary<BuildingType, Building>();
-        private static void AddBuilding(Building b)
-        {
-            blds.Add(b.Type, b);
-        }
-
-        public static Building NewBuilding(BuildingType t, Player owner, int id, Vector2 position)
-        {
-            return blds[t].Clone(owner, id, position);
-        }
-
+        }       
+        public override void Update() { }
         public override GameObject Clone()
         {
             return Clone(OwnerPlayer, Id, Position);
         }
-
-        private void FinalizeOperation(BuildingOperation op)
-        {
-            switch (op.Type)
-            {
-                case BuildingOperationType.DoLocalResearch:
-                    {
-                        OwnerPlayer.UtilizeEnergy(-op.EnergyConsumation);
-                        Researches |= (LocalResearch)op.ParA;
-                        // TODO: Trigger some event
-                    }
-                    break;
-            }
-        }
-
         public override void Serialize(Stream str)
         {
             base.Serialize(str);
@@ -275,13 +176,51 @@ namespace MineBotGame.GameObjects
             bw.WriteIVector(Position);
             bw.WriteIVector(Size);
             bw.Write((int)Researches);
-            bw.Write(_hp);
-            bw.Write(_def);
-            bw.Write(_energy);
+            bw.Write(hp);
+            bw.Write(def);
+            bw.Write(energy);
 
             bw.Write(OperationQueue.Count);
             for (int i = 0; i < OperationQueue.Count; i++)
                 OperationQueue[i].Serialize(str);
+        }
+        protected void FinalizeOperation(BuildingOperation op)//Do
+        {
+            switch (op.Type)
+            {
+                case BuildingOperationType.DoLocalResearch:
+                    {
+                        OwnerPlayer.UtilizeEnergy(-op.EnergyConsumation);
+                        Researches |= (LocalResearch)op.ParA;
+                    }
+                    break;
+                case BuildingOperationType.DoGlobalResearch:
+                    {
+                        OwnerPlayer.UtilizeEnergy(-op.EnergyConsumation);
+                        Researches |= (LocalResearch)op.ParA;
+                    }
+                    break;
+                case BuildingOperationType.NewModule:
+                    {
+                        OwnerPlayer.UtilizeEnergy(-op.EnergyConsumation);
+                        Researches |= (LocalResearch)op.ParA;
+                    }
+                    break;
+                case BuildingOperationType.NewUnit:
+                    {
+                        OwnerPlayer.UtilizeEnergy(-op.EnergyConsumation);
+                        Researches |= (LocalResearch)op.ParA;
+                    }
+                    break;
+                case BuildingOperationType.NewUpgrade:
+                    {
+                        OwnerPlayer.UtilizeEnergy(-op.EnergyConsumation);
+                        Researches |= (LocalResearch)op.ParA;
+                    }
+                    break;
+                case BuildingOperationType.None:
+                    break;
+            }
         }
     }
 }

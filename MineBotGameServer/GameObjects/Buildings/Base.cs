@@ -8,12 +8,15 @@ namespace MineBotGame.GameObjects.Buildings
 {
     public class Base : Building
     {
-        public Base() : base(new Vector2(4,4))
+        private static readonly int maxHP = 1000;
+        private static readonly int startDefence = 10;
+        private static readonly int startEnergyConsumation = 10;
+        private static readonly Vector2 size = new Vector2(4,4);
+        private static new readonly LocalResearch availableLResearches = LocalResearch.MoreEnergy | LocalResearch.MoreStorage;
+        private static new readonly GlobalResearch availableGResearches = GlobalResearch.None;
+        private static new readonly BuildingOperationType availableOperations = BuildingOperationType.NewUnit|BuildingOperationType.DoLocalResearch;
+        public Base(Player ownerPlayer, int id, Vector2 pos) : base(ownerPlayer, id, pos, size,maxHP,startDefence,startEnergyConsumation, availableOperations, availableGResearches, availableLResearches)
         {
-            _hp = 1000;
-            _def = 10;
-            _energy = 10;
-            availableLResearches = LocalResearch.None;
             onAdd = (p) =>
             {
                 p.EnergyGeneration += 50.0;
@@ -21,26 +24,23 @@ namespace MineBotGame.GameObjects.Buildings
             };
             onRemove = (p) =>
             {
-                p.EnergyGeneration -= 40.0;
+                p.EnergyGeneration -= 50.0;
                 p.ResourceLimits.AddAll(-200);
             };
+
         }
-        public Base(Player ownerPlayer, int id, Vector2 size) : base(ownerPlayer, id, new Vector2(4,4), size)
+        public override void Update()
         {
-            _hp = 1000;
-            _def = 10;
-            _energy = 10;
-            availableLResearches = LocalResearch.None;
-            onAdd = (p) => 
+            if (OperationQueue.Count != 0)
             {
-                p.EnergyGeneration += 50.0;
-                p.ResourceLimits.AddAll(200);
-            };
-            onRemove = (p) =>
-            {
-                p.EnergyGeneration -= 40.0;
-                p.ResourceLimits.AddAll(-200);
-            };
+                var op = OperationQueue.First();
+                op.Done++;
+                if (op.Done == op.NeedDone)
+                {
+                    Dequeue();
+                    FinalizeOperation(op);
+                }
+            }
         }
     }
 }

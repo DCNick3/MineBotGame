@@ -72,6 +72,11 @@
     <Compile Include="Enums.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Game.cs" />
+    <Compile Include="GameObjects\BuidingOperations\NewGlobalResearch.cs" />
+    <Compile Include="GameObjects\BuidingOperations\NewLocalResearch.cs" />
+    <Compile Include="GameObjects\BuidingOperations\NewModule.cs" />
+    <Compile Include="GameObjects\BuidingOperations\NewUnit.cs" />
+    <Compile Include="GameObjects\BuidingOperations\NewUpgrate.cs" />
     <Compile Include="GameObjects\BuildingOperation.cs" />
     <Compile Include="GameObjects\Buildings\Base.cs" />
     <Compile Include="GameObjects\Buildings\Generator.cs" />

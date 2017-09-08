@@ -15,7 +15,7 @@ namespace MineBotGame.GameObjects
         
         public int Done { get; set; } 
         public int NeedDone { get; private set; }
-        public BuildingOperationType Type { get; private set; }
+        public BuildingOperationType Type { get; protected set; }
         public int ParA { get; private set; }
         public int ParB { get; private set; }
 

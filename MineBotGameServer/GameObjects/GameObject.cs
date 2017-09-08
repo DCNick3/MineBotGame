@@ -16,10 +16,9 @@ namespace MineBotGame.GameObjects
             this.id = id;
         }
 
-        public abstract double HP { get; }
-        public abstract double Defence { get; }
-        public abstract double EnergyConsumation { get; }
-
+        public abstract double HP { get;protected set; }
+        public abstract double Defence { get; protected set; }
+        public abstract double EnergyConsumation { get; protected set; }
         public abstract Vector2 Position { get; }
         public int Id { get { return id; } }
         public Player OwnerPlayer { get { return ownerPlayer; } }
