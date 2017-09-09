@@ -15,17 +15,22 @@ namespace MineBotGame.GameObjects
         public NewUnit(Building building, Vector2 spawnPosition) : base(needDone,type,new ResourceTotality(new int[] { 5, 0, 0, 0 }), startEnergyCostumation, building)
         {
             this.spawnPosition = spawnPosition;
+            StartOperation();
         }
         public override bool CanBeDone()
         {
-            if (!building.GetNearFreeSpace().Contains(spawnPosition))
+            if (base.CanBeDone())
             {
-                return false;
+                if (!building.GetNearFreeSpace().Contains(spawnPosition))
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
             }
-            else
-            {
-                return true;
-            }
+            return false;
         }
         public override void FinalizeOperation()
         {

@@ -30,7 +30,7 @@ namespace MineBotGame.GameObjects
         protected readonly double scout = 10.0;
         private readonly Vector2 pos;
         public BuildingType Type { get; protected set; }        
-        public LocalResearch Researches { get; protected set; }
+        public LocalResearch LResearches { get; set; }
         public override double HP
         {
             get
@@ -135,7 +135,7 @@ namespace MineBotGame.GameObjects
         {
             var r = new Building(ownerPlayer, id, pos, Size, hp, def, energy,availableOperations,availableGResearches,availableLResearches)
             {
-                Researches = Researches,
+                LResearches = LResearches,
                 onAdd = onAdd,
                 onRemove = onRemove,
             };
@@ -144,17 +144,11 @@ namespace MineBotGame.GameObjects
         }
         public ActionError DoGlobalResearch(GlobalResearch type)
         {
-            if ((type & availableGResearches) == 0)
-                return ActionError.ImpossibleAction;
-
             BuildingOperation op = BuildingOperation.NewGlobalResearch(type);
             return DoOperation(op);
         }
         public ActionError DoLocalResearch(LocalResearch type)
         {
-            if ((type & availableLResearches) == 0)
-                return ActionError.ImpossibleAction;
-
             BuildingOperation op = BuildingOperation.NewLocalResearch(type);
             return DoOperation(op);
         }
@@ -179,6 +173,17 @@ namespace MineBotGame.GameObjects
                 return ActionError.InvalidQueueIndex;
             OperationQueue.RemoveAt(queueIndex);
             return ActionError.Succeed;
+        }
+        public bool CanDoLocalResearche(LocalResearch researche)
+        {
+            if ((researche & LResearches) == 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
         public void OnAdd(Player p)
         {
@@ -214,7 +219,7 @@ namespace MineBotGame.GameObjects
             bw.Write((int)Type);
             bw.WriteIVector(Position);
             bw.WriteIVector(Size);
-            bw.Write((int)Researches);
+            bw.Write((int)LResearches);
             bw.Write(hp);
             bw.Write(def);
             bw.Write(energy);

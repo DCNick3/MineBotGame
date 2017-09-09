@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Numerics;
@@ -24,6 +25,8 @@ namespace MineBotGame.GameObjects
         private UnitStats stats;
         
         private Vector2 _pos;
+
+        public List<Building> Paralizers = new List<Building>();//на случай если юнита сдерживает несколько зданий
 
         public override double HP
         {
@@ -102,6 +105,10 @@ namespace MineBotGame.GameObjects
                 //do it later
             }
             return false;
+        }
+        public bool CanPlaceModule(UnitModule module)
+        {
+            return !unitModules[(int)module];
         }
 
         /// <summary>

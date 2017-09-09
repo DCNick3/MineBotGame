@@ -26,6 +26,7 @@ namespace MineBotGame.GameObjects
             return true;
         }
         public virtual void FinalizeOperation() { }
+        public virtual void StartOperation() { }
         protected Building building;
         public int Done { get; set; } 
         public int NeedDone { get; private set; }
@@ -38,28 +39,27 @@ namespace MineBotGame.GameObjects
 
         public static BuildingOperation NewUnit(Building building,Vector2 spawnPos)
         {
-            return new NewUnit(building);
+            return new NewUnit(building,spawnPos);
         }
 
         public static BuildingOperation NewUpgrade(int unitId, UnitUpgrade up)
         {
-            return new BuildingOperation() { Type = BuildingOperationType.NewUpgrade, NeedDone = 2, ParA = unitId, ParB = (int)up };
+            return new NewUpgrade();
         }
 
         public static BuildingOperation NewModule(int unitId, UnitModule mod)
         {
-            return new BuildingOperation() { Type = BuildingOperationType.NewModule, NeedDone = 2, ParA = unitId, ParB = (int)mod };
+            return new NewModule();
         }
 
         public static BuildingOperation NewGlobalResearch(GlobalResearch res)
         {
-            return new BuildingOperation() { Type = BuildingOperationType.DoGlobalResearch, NeedDone = 2, ParA = (int)res };
+            return new NewLocalResearche();
         }
 
         public static BuildingOperation NewLocalResearch(LocalResearch res)
         {
-            return new BuildingOperation() { Type = BuildingOperationType.DoLocalResearch, NeedDone = 2, ParA = (int)res,
-                EnergyConsumation = GetEnergyL(res), ResourceConsumation = GetResL(res) };
+            return new NewGlobalResearche();
         }
 
         private static int GetEnergyL(LocalResearch res)

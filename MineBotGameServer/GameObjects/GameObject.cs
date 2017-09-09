@@ -24,13 +24,14 @@ namespace MineBotGame.GameObjects
         public Player OwnerPlayer { get { return ownerPlayer; } }
         public Vector2 Size { get { return size; } }
         public abstract double ScoutRange { get; }
+        public static GlobalResearch globalResearches;
         private readonly Player ownerPlayer;
         private readonly Vector2 size;
         private readonly int id;
         
         public static int createId()
         {
-            return 0;//do tomething
+            return 0;//TODO
         }
 
         public Vector2 Center { get { return Position + size / 2; } }
