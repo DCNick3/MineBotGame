@@ -43,8 +43,6 @@
         BuildingBoost = 6,
         VisibilityRadiusIncrease = 7,
         HeavyArmor = 8,
-        EnergyArmor = 9,
-        Carry = 10,
     }
 
     public enum BuildingOperationType

@@ -19,6 +19,7 @@ namespace MineBotGame.GameObjects
 
         bool[] unitModules;
         int[] unitUpgrades;
+        readonly int[] maxUpgradeLevels = new int[] {0,5,3,3,3,5,3,3,3};//customizable constant
 
         private UnitStats stats;
         
@@ -74,9 +75,33 @@ namespace MineBotGame.GameObjects
         {
             unitUpgrades[(int)upgrade] = value;
         }
+        public void SetUpgrade(int upgrade, int value)
+        {
+            unitUpgrades[upgrade] = value;
+        }
         public int GetUpgrade(UnitUpgrade upgrade)
         {
             return unitUpgrades[(int)upgrade];
+        }
+        public int GetUpgrade(int upgrade)
+        {
+            return unitUpgrades[upgrade];
+        }
+        public bool CanUpgrade(UnitUpgrade upgrate)
+        {
+            if (unitUpgrades[(int)upgrate] + 1 <= maxUpgradeLevels[(int)upgrate])
+            {
+                //do it later
+            }
+            return false;
+        }
+        public bool CanUpgrade(int upgrate)
+        {
+            if (unitUpgrades[upgrate] + 1 <= maxUpgradeLevels[upgrate])
+            {
+                //do it later
+            }
+            return false;
         }
 
         /// <summary>

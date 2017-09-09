@@ -85,6 +85,33 @@ namespace MineBotGame.GameObjects
         protected readonly GlobalResearch availableGResearches = GlobalResearch.None;
         protected readonly BuildingOperationType availableOperations = BuildingOperationType.None;
 
+        public Vector2[] GetNearFreeSpace()
+        {
+            List<Vector2> vectors= new List<Vector2>();
+            for (int x = (int)Position.X; x < (int)Position.X + (int)Size.X; x++)
+            {
+                if (!OwnerPlayer.gameArea[x, (int)Position.Y - 1].IsObstacle)
+                {
+                    vectors.Add(new Vector2(x, (int)Position.Y - 1));
+                }
+                if (!OwnerPlayer.gameArea[x, (int)Position.Y + (int)Size.Y].IsObstacle)
+                {
+                    vectors.Add(new Vector2(x, (int)Position.Y + (int)Size.Y));
+                }
+            }
+            for (int y = (int)Position.Y; y < (int)Position.Y + (int)Size.Y; y++)
+            {
+                if (!OwnerPlayer.gameArea[y, (int)Position.X - 1].IsObstacle)
+                {
+                    vectors.Add(new Vector2(y, (int)Position.X - 1));
+                }
+                if (!OwnerPlayer.gameArea[y, (int)Position.X + (int)Size.X].IsObstacle)
+                {
+                    vectors.Add(new Vector2(y, (int)Position.X + (int)Size.X));
+                }
+            }
+            return vectors.ToArray();
+        }
         public bool Enqueue(BuildingOperation operation)
         {
             if (OperationQueue.Count == QUEUE_SIZE)
@@ -163,7 +190,19 @@ namespace MineBotGame.GameObjects
             p.EnergyConsumation -= EnergyConsumation;
             onRemove(p);
         }       
-        public override void Update() { }
+        public override void Update()
+        {
+            if (OperationQueue.Count != 0)
+            {
+                var op = OperationQueue.First();
+                op.Done++;
+                if (op.Done == op.NeedDone)
+                {
+                    Dequeue();
+                    FinalizeOperation(op);
+                }
+            }
+        }
         public override GameObject Clone()
         {
             return Clone(OwnerPlayer, Id, Position);
@@ -184,43 +223,9 @@ namespace MineBotGame.GameObjects
             for (int i = 0; i < OperationQueue.Count; i++)
                 OperationQueue[i].Serialize(str);
         }
-        protected void FinalizeOperation(BuildingOperation op)//Do
+        protected void FinalizeOperation(BuildingOperation op)
         {
-            switch (op.Type)
-            {
-                case BuildingOperationType.DoLocalResearch:
-                    {
-                        OwnerPlayer.UtilizeEnergy(-op.EnergyConsumation);
-                        Researches |= (LocalResearch)op.ParA;
-                    }
-                    break;
-                case BuildingOperationType.DoGlobalResearch:
-                    {
-                        OwnerPlayer.UtilizeEnergy(-op.EnergyConsumation);
-                        Researches |= (LocalResearch)op.ParA;
-                    }
-                    break;
-                case BuildingOperationType.NewModule:
-                    {
-                        OwnerPlayer.UtilizeEnergy(-op.EnergyConsumation);
-                        Researches |= (LocalResearch)op.ParA;
-                    }
-                    break;
-                case BuildingOperationType.NewUnit:
-                    {
-                        OwnerPlayer.UtilizeEnergy(-op.EnergyConsumation);
-                        Researches |= (LocalResearch)op.ParA;
-                    }
-                    break;
-                case BuildingOperationType.NewUpgrade:
-                    {
-                        OwnerPlayer.UtilizeEnergy(-op.EnergyConsumation);
-                        Researches |= (LocalResearch)op.ParA;
-                    }
-                    break;
-                case BuildingOperationType.None:
-                    break;
-            }
+            op.FinalizeOperation();          
         }
     }
 }

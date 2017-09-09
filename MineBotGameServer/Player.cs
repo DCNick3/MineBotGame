@@ -59,7 +59,7 @@ namespace MineBotGame
 
         public PlayerController Controller { get { return controller; } }
         public PlayerParameters Parameters { get; set; }
-        
+        public GameArea gameArea;
         public double EnergyConsumation { get; set; }
         public double EnergyGeneration { get; set; }
         public Dictionary<int, GameObject> Objects { get { return ownedObjects; } }
@@ -125,6 +125,11 @@ namespace MineBotGame
                 return false;
         }
 
+        public void AddObject(GameObject gameObject)
+        {
+            //todo
+        }
+
         public bool CheckEnergy(int energy)
         {
             if (EnergyGeneration - EnergyConsumation >= energy && EnergyConsumation + energy >= 0)
@@ -171,8 +176,7 @@ namespace MineBotGame
                 {
                     /* TODO: Trigger event */
                     ownedObjects.Remove(o.Id);
-                    if (ownedObjects.Count != 0)
-                        i--;
+                    i--;
                     continue;
                 }
 

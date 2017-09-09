@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MineBotGame.GameObjects.BuidingOperations
+namespace MineBotGame.GameObjects
 {
     class NewModule
     {
+
     }
 }

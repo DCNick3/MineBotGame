@@ -27,6 +27,11 @@ namespace MineBotGame.GameObjects
         private readonly Player ownerPlayer;
         private readonly Vector2 size;
         private readonly int id;
+        
+        public static int createId()
+        {
+            return 0;//do tomething
+        }
 
         public Vector2 Center { get { return Position + size / 2; } }
 

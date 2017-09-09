@@ -15,6 +15,11 @@ namespace MineBotGame
             resources = new int[Enum.GetValues(typeof(ResourceType)).Length];
         }
 
+        public ResourceTotality(int[] resourceCostumation)
+        {
+            resources = resourceCostumation;
+        }
+
         int[] resources;
 
         public int this[ResourceType res]
