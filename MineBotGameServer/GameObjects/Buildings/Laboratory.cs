@@ -22,7 +22,16 @@ namespace MineBotGame.GameObjects.Buildings
         }
         public override void Update()
         {
-
+            if (OperationQueue.Count != 0)
+            {
+                var op = OperationQueue.First();
+                op.Done++;
+                if (op.Done == op.NeedDone)
+                {
+                    Dequeue();
+                    FinalizeOperation(op);
+                }
+            }
         }
     }
 }

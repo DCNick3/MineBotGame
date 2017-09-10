@@ -21,7 +21,7 @@ namespace MineBotGame.GameObjects
         {
             if (base.CanBeDone())
             {
-                if ((GameObject.globalResearches & research) == 0)
+                if ((building.OwnerPlayer.globalResearches & research) == 0)
                 {
                     return true;
                 }
@@ -34,7 +34,7 @@ namespace MineBotGame.GameObjects
         }
         public override void FinalizeOperation()
         {
-            GameObject.globalResearches |= research;
+            building.OwnerPlayer.globalResearches |= research;
         }
     }
 }

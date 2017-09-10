@@ -63,8 +63,8 @@ namespace MineBotGame
         public double EnergyConsumation { get; set; }
         public double EnergyGeneration { get; set; }
         public Dictionary<int, GameObject> Objects { get { return ownedObjects; } }
+        public GlobalResearch globalResearches;
 
-        
         public ResourceTotality Resources { get { return resources; } }
         public ResourceTotality ResourceLimits { get { return resourceLimits; } }
 

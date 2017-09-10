@@ -14,7 +14,6 @@ namespace MineBotGame.GameObjects
         protected BuildingOperation(int needDone,int type, ResourceTotality resourceConsumation, int energyConsumation,Building building)
         {
             Done = 0;
-            ResourceConsumation = new ResourceTotality();
             NeedDone = needDone;
             Type = (BuildingOperationType)type;
             ResourceConsumation = resourceConsumation;
@@ -23,10 +22,24 @@ namespace MineBotGame.GameObjects
         }
         public virtual bool CanBeDone()
         {
-            return true;
+            if (building.OwnerPlayer.CheckResources(ResourceConsumation) && building.OwnerPlayer.CheckEnergy(EnergyConsumation))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
-        public virtual void FinalizeOperation() { }
-        public virtual void StartOperation() { }
+        public virtual void FinalizeOperation()
+        {
+
+        }
+        public virtual void StartOperation()
+        {
+            building.OwnerPlayer.UtilizeResources(ResourceConsumation);
+            building.OwnerPlayer.UtilizeEnergy(EnergyConsumation);
+        }
         protected Building building;
         public int Done { get; set; } 
         public int NeedDone { get; private set; }
@@ -42,24 +55,24 @@ namespace MineBotGame.GameObjects
             return new NewUnit(building,spawnPos);
         }
 
-        public static BuildingOperation NewUpgrade(int unitId, UnitUpgrade up)
+        public static BuildingOperation NewUpgrade(Building building,Unit unit, UnitUpgrade up)
         {
-            return new NewUpgrade();
+            return new NewUpgrade(building, unit, (int)up);
         }
 
-        public static BuildingOperation NewModule(int unitId, UnitModule mod)
+        public static BuildingOperation NewModule(Building building, Unit unit, UnitModule mod)
         {
-            return new NewModule();
+            return new NewModule(building, unit, mod);
         }
 
-        public static BuildingOperation NewGlobalResearch(GlobalResearch res)
+        public static BuildingOperation NewGlobalResearch(Building building, GlobalResearch res)
         {
-            return new NewLocalResearche();
+            return new NewGlobalResearch(building,res);
         }
 
-        public static BuildingOperation NewLocalResearch(LocalResearch res)
+        public static BuildingOperation NewLocalResearch(Building building, LocalResearch res)
         {
-            return new NewGlobalResearche();
+            return new NewLocalResearch(building, res);
         }
 
         private static int GetEnergyL(LocalResearch res)

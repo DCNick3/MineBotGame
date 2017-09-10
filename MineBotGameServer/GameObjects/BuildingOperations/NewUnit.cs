@@ -21,13 +21,13 @@ namespace MineBotGame.GameObjects
         {
             if (base.CanBeDone())
             {
-                if (!building.GetNearFreeSpace().Contains(spawnPosition))
+                if (building.GetNearFreeSpace().Contains(spawnPosition))
                 {
-                    return false;
+                    return true;
                 }
                 else
                 {
-                    return true;
+                    return false;
                 }
             }
             return false;

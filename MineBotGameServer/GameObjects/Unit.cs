@@ -13,7 +13,7 @@ namespace MineBotGame.GameObjects
     {
         private Unit(Vector2 pos, Player ownerPlayer, int id) : base(ownerPlayer, id, new Vector2(1,1))
         {
-            _pos = pos;
+            this.pos = pos;
             unitModules = new bool[Enum.GetValues(typeof(UnitModule)).Length];
             unitUpgrades = new int[Enum.GetValues(typeof(UnitUpgrade)).Length];
         }
@@ -24,7 +24,7 @@ namespace MineBotGame.GameObjects
 
         private UnitStats stats;
         
-        private Vector2 _pos;
+        private Vector2 pos;
 
         public List<Building> Paralizers = new List<Building>();//на случай если юнита сдерживает несколько зданий
 
@@ -34,6 +34,7 @@ namespace MineBotGame.GameObjects
             {
                 return stats[UnitStatType.HP];
             }
+            protected set { }
         }
         public override double Defence
         {
@@ -41,6 +42,7 @@ namespace MineBotGame.GameObjects
             {
                 return stats[UnitStatType.Defence];
             }
+            protected set { }
         }
         public override double EnergyConsumation
         {
@@ -48,6 +50,7 @@ namespace MineBotGame.GameObjects
             {
                 return stats.OverallEnergy;
             }
+            protected set { }
         }
         public override double ScoutRange
         {
@@ -61,7 +64,7 @@ namespace MineBotGame.GameObjects
         {
             get
             {
-                return _pos;
+                return pos;
             }
         }
 
@@ -94,7 +97,10 @@ namespace MineBotGame.GameObjects
         {
             if (unitUpgrades[(int)upgrate] + 1 <= maxUpgradeLevels[(int)upgrate])
             {
-                //do it later
+                switch (upgrate)
+                {
+                    case 
+                }
             }
             return false;
         }
@@ -102,7 +108,7 @@ namespace MineBotGame.GameObjects
         {
             if (unitUpgrades[upgrate] + 1 <= maxUpgradeLevels[upgrate])
             {
-                //do it later
+                //TODO it later
             }
             return false;
         }

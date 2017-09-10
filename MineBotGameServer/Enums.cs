@@ -29,7 +29,7 @@
         MeleeAttack = 2,
         RangeAttack = 3,
         Building = 4,
-        Repair = 5,
+        Repair = 5
     }
 
     public enum UnitUpgrade
@@ -119,5 +119,6 @@
         GameObjectDoesNotExists = 5,
         NoEnergy = 6,
         InvalidQueueIndex = 7,
+        InvalidParam = 8
     }
 }

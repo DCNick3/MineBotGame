@@ -26,6 +26,7 @@ namespace MineBotGame.GameObjects
         private const int QUEUE_SIZE = 5;
         private double hp;
         private double def;
+
         private double energy;
         protected readonly double scout = 10.0;
         private readonly Vector2 pos;
@@ -144,12 +145,12 @@ namespace MineBotGame.GameObjects
         }
         public ActionError DoGlobalResearch(GlobalResearch type)
         {
-            BuildingOperation op = BuildingOperation.NewGlobalResearch(type);
+            BuildingOperation op = BuildingOperation.NewGlobalResearch(this,type);
             return DoOperation(op);
         }
         public ActionError DoLocalResearch(LocalResearch type)
         {
-            BuildingOperation op = BuildingOperation.NewLocalResearch(type);
+            BuildingOperation op = BuildingOperation.NewLocalResearch(this,type);
             return DoOperation(op);
         }
         public ActionError DoOperation(BuildingOperation op)
@@ -160,10 +161,9 @@ namespace MineBotGame.GameObjects
                 return ActionError.NoResources;
             if (!OwnerPlayer.CheckEnergy(op.EnergyConsumation))
                 return ActionError.NoEnergy;
-
-            OwnerPlayer.UtilizeEnergy(op.EnergyConsumation);
-            OwnerPlayer.UtilizeResources(op.ResourceConsumation);
-
+            if (op.CanBeDone())
+                return ActionError.InvalidParam;
+            op.StartOperation();//здесь снимаются ресурсы и энергия
             Enqueue(op);
             return ActionError.Succeed;
         }
