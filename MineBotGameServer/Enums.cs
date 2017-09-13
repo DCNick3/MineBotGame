@@ -43,6 +43,7 @@
         BuildingBoost = 6,
         VisibilityRadiusIncrease = 7,
         HeavyArmor = 8,
+        RepairBoost = 9,
     }
 
     public enum BuildingOperationType
@@ -53,6 +54,17 @@
         NewUpgrade = 4,
         DoLocalResearch = 8,
         DoGlobalResearch = 16
+    }
+    public enum UnitOperationType
+    {
+        None = 0,
+        Move = 1,
+        Mine = 2,
+        RangeHit = 3,
+        MeleeHit = 4,
+        BuildStart = 5,  /* Приступаем к строительству... */
+        Repair = 6,   /* Чиним GameObject*/
+        //AbortOperation = 7,    /* Бросаем действие незаконченным, теперь можно двигаться*/
     }
 
     public enum UnitStatType

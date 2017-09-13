@@ -10,7 +10,7 @@ namespace MineBotGame.GameObjects
         static UnitUpgradeInfo()
         {
             dat = new UnitStats[Enum.GetValues(typeof(UnitUpgrade)).Length];
-
+            //TODO: настроить эффекты параметров
         }
 
         private static UnitStats[] dat;

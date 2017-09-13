@@ -21,13 +21,9 @@ namespace MineBotGame.GameObjects
         bool[] unitModules;
         int[] unitUpgrades;
         readonly int[] maxUpgradeLevels = new int[] {0,5,3,3,3,5,3,3,3};//customizable constant
-
         private UnitStats stats;
-        
         private Vector2 pos;
-
         public List<Building> Paralizers = new List<Building>();//на случай если юнита сдерживает несколько зданий
-
         public override double HP
         {
             get
@@ -58,8 +54,7 @@ namespace MineBotGame.GameObjects
             {
                 return stats[UnitStatType.ScoutRange];
             }
-        }
-
+        }        
         public override Vector2 Position
         {
             get
@@ -67,6 +62,8 @@ namespace MineBotGame.GameObjects
                 return pos;
             }
         }
+        public double ActionPoints { get; set; }
+        private UnitOperation performingOperation;
 
         public void SetModule(UnitModule module, bool value)
         {
@@ -76,7 +73,6 @@ namespace MineBotGame.GameObjects
         {
             return unitModules[(int)module];
         }
-
         public void SetUpgrade(UnitUpgrade upgrade, int value)
         {
             unitUpgrades[(int)upgrade] = value;
@@ -99,8 +95,46 @@ namespace MineBotGame.GameObjects
             {
                 switch (upgrate)
                 {
-                    case 
+                    //case UnitUpgrade.Efficiency://можно всегда
+                    //    break;
+                    case UnitUpgrade.MiningBoost:
+                        if (!unitModules[(int)UnitModule.Mining])
+                        {
+                            return false;
+                        }
+                        break;    
+                    case UnitUpgrade.MeleeBoost:
+                        if (!unitModules[(int)UnitModule.MeleeAttack])
+                        {
+                            return false;
+                        }
+                        break;
+                    case UnitUpgrade.DistantBoost:
+                        if (!unitModules[(int)UnitModule.RangeAttack])
+                        {
+                            return false;
+                        }
+                        break;
+                    //case UnitUpgrade.MovingBoost://можно всегда
+                    //    break;
+                    case UnitUpgrade.BuildingBoost:
+                        if (!unitModules[(int)UnitModule.Building])
+                        {
+                            return false;
+                        }
+                        break;
+                    //case UnitUpgrade.VisibilityRadiusIncrease://можно всегда
+                    //    break;
+                    //case UnitUpgrade.HeavyArmor://можно всегда
+                    //    break;
+                    case UnitUpgrade.RepairBoost:
+                        if (!unitModules[(int)UnitModule.Repair])
+                        {
+                            return false;
+                        }
+                        break;
                 }
+                return true;
             }
             return false;
         }
@@ -116,29 +150,61 @@ namespace MineBotGame.GameObjects
         {
             return !unitModules[(int)module];
         }
-
+        private UnitOperation CreateUnitOperation(UnitOperationType type)
+        {
+            switch (type)
+            {
+                case UnitOperationType.Move:
+                    return new Move(this);
+                case UnitOperationType.Mine:
+                    return new Mine(this);
+                case UnitOperationType.RangeHit:
+                    return new RangeHit(this);
+                case UnitOperationType.MeleeHit:
+                    return new MeleeHit(this);
+                case UnitOperationType.BuildStart:
+                    return new BuildStart(this);
+                case UnitOperationType.Repair:
+                    return new Repair(this);
+            }
+            return null;
+        }
+        public void Update(UnitOperationType operation)
+        {
+            if (operation != UnitOperationType.None)
+            {
+                performingOperation = CreateUnitOperation(operation);
+                performingOperation.StartOperation();
+            }
+            if (performingOperation != null)
+            {
+                performingOperation.DoneAdd();
+                if (performingOperation.Done == performingOperation.NeedDone)
+                {
+                    performingOperation.FinalizeOperation();
+                    performingOperation = null;
+                }
+            }
+        }
         /// <summary>
         /// Updates stats, recalculating it by upgrades & modules
         /// </summary>
         public void UpdateValues()
         {
-            foreach (var m in Enum.GetValues(typeof(UnitUpgrade)).Cast<UnitUpgrade>().Where((_) => _ != UnitUpgrade.None))
+            foreach (var m in Enum.GetValues(typeof(UnitUpgrade)).Cast<UnitUpgrade>().Where((_) => _ != UnitUpgrade.None))//перечисление всех юнит-upgrade-ов
             {
                 int n = GetUpgrade(m);
                 stats = stats + n * UnitUpgradeInfo.Get(m);
             }
         }
-
         public override GameObject Clone()
         {
             return new Unit(Position, OwnerPlayer, Id) { stats = stats.Clone(), unitModules = (bool[])unitModules.Clone(), unitUpgrades = (int[])unitUpgrades.Clone() };
         }
-
         public static Unit NewUnit(Vector2 pos, Player ownerPlayer, int id)
         {
             return new Unit(pos, ownerPlayer, id);
         }
-
         public override void Serialize(Stream str)
         {
             base.Serialize(str);

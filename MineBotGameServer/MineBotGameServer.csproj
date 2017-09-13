@@ -88,6 +88,13 @@
     <Compile Include="GameArea.cs" />
     <Compile Include="GameObjects\Building.cs" />
     <Compile Include="GameObjects\GameObject.cs" />
+    <Compile Include="GameObjects\UnitOperations\BuildStart.cs" />
+    <Compile Include="GameObjects\UnitOperations\MeleeHit.cs" />
+    <Compile Include="GameObjects\UnitOperations\Mine.cs" />
+    <Compile Include="GameObjects\UnitOperations\Move.cs" />
+    <Compile Include="GameObjects\UnitOperations\RangeHit.cs" />
+    <Compile Include="GameObjects\UnitOperations\Repair.cs" />
+    <Compile Include="GameObjects\UnitOperation.cs" />
     <Compile Include="GameObjects\UnitUpgradeInfo.cs" />
     <Compile Include="ResourceStack.cs" />
     <Compile Include="GameState.cs" />
